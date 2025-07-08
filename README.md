@@ -1,5 +1,8 @@
 # Specification-Driven Development (SDD) Repository
 
+>[!NOTE]
+>This is heavily based on [**work done by John Lam**](https://github.com/jflam/sdd).
+
 This repository contains the foundational documentation and tools for adopting and implementing Spec-Driven Development (SDD) - a methodology that inverts the traditional relationship between specifications and code by making specifications the primary artifact that generates implementation(s).
 
 ## 🎯 Overview
