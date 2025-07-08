@@ -48,24 +48,6 @@ The `base/templates/` directory contains structured templates for:
 - **Feature Specifications** - Business requirements and user stories
 - **Implementation Plans** - Technical architecture and development approach
 
-### 3. Document Generation Workflow
-
-This repository includes an automated workflow for generating Word documents:
-
-```bash
-# Generate Word document from any markdown file
-./gen.sh filename-without-extension
-
-# Example: Generate Word doc from sdd.md
-./gen.sh sdd
-```
-
-**Important**: When editing root-level `.md` files, always:
-
-1. Edit the markdown file
-2. Run `./gen.sh <filename>` to generate the Word document
-3. Commit both files together
-
 ## 🤖 Claude Code Integration
 
 ### Key Claude Code Patterns
