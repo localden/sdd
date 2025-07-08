@@ -55,32 +55,10 @@ The `base/templates/` directory contains structured templates for:
 
 ### Key Claude Code Patterns
 
-When working with this repository through Claude Code:
+You can use this repository as a template to get started with Claude Code and SDD.
 
-#### Creating Feature Specifications
-
-```text
-Use the feature-spec-template.md as your starting point.
-Focus on WHAT users need and WHY, not HOW to implement.
-Mark all ambiguities with [NEEDS CLARIFICATION: specific question].
-```
-
-#### Creating Implementation Plans
-
-```text
-Use the implementation-plan-template.md as your guide.
-Mark technical decisions that need clarification.
-Extract detailed code to implementation-details/ files.
-Use pseudocode in the main plan document.
-```
-
-#### Document Generation
-
-```text
-After editing any root-level .md file:
-1. Run: ./gen.sh <filename-without-extension>
-2. Commit both .md and .docx files together
-```
+1. Clone this repository.
+1. Launch Claude Code from inside the cloned folder (context should be in the root, where `CLAUDE.md` is located).
 
 ## 🔧 Prerequisites
 
