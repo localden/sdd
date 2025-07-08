@@ -83,5 +83,5 @@ After editing any root-level .md file:
 
 To use this repository effectively:
 
-- **Linux** (can be used via WSL2) or **macOS** operating system
+- **Linux** (can be used via [WSL2](https://learn.microsoft.com/windows/wsl/install)) or **macOS** operating system
 - [Claude Code](https://www.anthropic.com/claude-code)
