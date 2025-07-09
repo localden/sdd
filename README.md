@@ -5,6 +5,21 @@
 
 This repository contains the foundational documentation and tools for adopting and implementing Spec-Driven Development (SDD) - a methodology that inverts the traditional relationship between specifications and code by making specifications the primary artifact that generates implementation(s).
 
+## Table of Contents
+
+- [🎯 Overview](#-overview)
+- [🔧 Prerequisites](#-prerequisites)
+- [📁 Repository Structure](#-repository-structure)
+- [🚀 Quick Start for Claude Code Users](#-quick-start-for-claude-code-users)
+  - [1. Understanding the Methodology](#1-understanding-the-methodology)
+  - [2. Using the Templates](#2-using-the-templates)
+- [🤖 Claude Code Integration](#-claude-code-integration)
+  - [STEP 1: Bootstrap the project](#step-1-bootstrap-the-project)
+  - [STEP 2: Functional specification clarification](#step-2-functional-specification-clarification)
+  - [STEP 3: Generate a plan](#step-3-generate-a-plan)
+  - [STEP 4: Have Claude Code validate the plan](#step-4-have-claude-code-validate-the-plan)
+  - [STEP 5: Implementation](#step-5-implementation)
+
 ## 🎯 Overview
 
 SDD represents a fundamental shift in software development where:
@@ -140,16 +155,16 @@ The output of this step will include a number of implementation detail documents
 ```text
 .
 ├── base
-│		 ├── CLAUDE.md
-│		 ├── memory
-│		 │		 └── constitution.md
-│		 └── templates
-│		     ├── feature-spec-template.md
-│		     └── implementation-plan-template.md
+│	├── CLAUDE.md
+│	├── memory
+│	│	└── constitution.md
+│	└── templates
+│	    ├── feature-spec-template.md
+│	    └── implementation-plan-template.md
 ├── gen.sh
 ├── media
-│		 ├── claude-code-starter.gif
-│		 └── generate-plan.gif
+│	├── claude-code-starter.gif
+│	└── generate-plan.gif
 ├── README.md
 ├── sdd.md
 ├── specify-proposal.md
