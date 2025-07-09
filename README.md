@@ -19,26 +19,23 @@ SDD represents a fundamental shift in software development where:
 ```text
 /
 ├── README.md                    # This file - how to use the repository
-├── CLAUDE.md                    # Claude Code specific instructions
 ├── sdd.md                       # Core SDD methodology document
 ├── specify-proposal.md          # Proposal for the Specify tool
 ├── gen.sh                       # Markdown to Word converter
 └── base/                        # Core templates and constitution
+    ├── CLAUDE.md                # Claude Code specific instructions
     ├── memory/
     │   └── constitution.md      # Immutable development principles
     └── templates/
-        ├── feature-spec-template.md      # Template for feature specifications
+        ├── feature-spec-template.md         # Template for feature specifications
         └── implementation-plan-template.md  # Template for implementation plans
 ```
-
->[!NOTE]
->The `gen.sh` script references `template.docx` and outputs to a `docx/` directory, but these don't currently exist in the repository.
 
 ## 🚀 Quick Start for Claude Code Users
 
 ### 1. Understanding the Methodology
 
-Start by reading the core documents in order:
+Start by reading the core documents to familiarize yourself with the principles:
 
 1. **`sdd.md`** - The complete SDD methodology.
 2. **`specify-proposal.md`** - Vision for tooling to support SDD.
@@ -51,6 +48,9 @@ The `base/templates/` directory contains structured templates for:
 - **Feature Specifications** - Business requirements and user stories
 - **Implementation Plans** - Technical architecture and development approach
 
+Similarly, the `base/.claude` directory contains Claude Code-specific `/` (slash) commands - `new_feature` and `generate_plan`, that can be used
+to bootstrap a new feature or create an execution plan for Claude Code to follow based on a feature definition.
+
 ## 🤖 Claude Code Integration
 
 ### Key Claude Code Patterns
@@ -58,7 +58,14 @@ The `base/templates/` directory contains structured templates for:
 You can use this repository as a template to get started with Claude Code and SDD.
 
 1. Clone this repository.
-1. Launch Claude Code from inside the cloned folder (context should be in the root, where `CLAUDE.md` is located).
+1. Launch Claude Code from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).
+1. Start iterating on the capabilities of your project.
+
+#### New features
+
+The first step should be creating a new feature. Use `/new_feature` and then specify the concrete requirements for the project you want to develop.
+
+![GIF showing Claude Code execution in an Ubuntu terminal](media/claude-code-starter.gif)
 
 ## 🔧 Prerequisites
 
