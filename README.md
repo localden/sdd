@@ -121,3 +121,13 @@ You should also ask Claude Code to validate the **Review & Acceptance Checklist*
 ```text
 Read the review and acceptance checklist, and check off each item in the checklist if the feature spec meets the criteria. Leave it empty if it does not.
 ```
+
+### STEP 3: Generate a plan
+
+You can now be specific about the tech stack and other technical requirements. You can use the `/generate_plan` command that is built into this repository, with the following prompt:
+
+```text
+We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use
+Blazor server with drag-and-drop task boards, real-time updates. There shoul dbe a REST API created with a projects API,
+tasks API, and a notifications API.
+```
