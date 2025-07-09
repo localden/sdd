@@ -165,5 +165,4 @@ The output of this step will include a number of implementation detail documents
         │		 └── 08-inter-library-tests.md
         ├── implementation-plan.md
         └── manual-testing.md
-
 ```
