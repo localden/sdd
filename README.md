@@ -99,3 +99,5 @@ delete any comments that you made, but you can't delete comments anybody else ma
 After this prompt is entered, you should see Claude Code kick off the planning and spec drafting process.
 
 ![Claude Code performing the planning and spec writing steps](media/new-feature-process.png)
+
+Once this step is completed, you should have a new branch created (e.g., `001-create-taskify`), as well as a new specification in the `specs/001-create-taskify` directory.
