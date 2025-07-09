@@ -105,3 +105,13 @@ Once this step is completed, you should have a new branch created (e.g., `001-cr
 The produced specification should contain a set of user stories and functional requirements.
 
 ![GIF showing the output specification produced by Claude Code](media/output-spec.gif)
+
+### STEP 2: Functional specification clarification
+
+With the baseline specification now created, you can go ahead and clarify any of the requirements that were not captured properly within the first shot attempt. For example, a prompt could be this:
+
+```text
+For each sample project or project that you create there should be a variable number of tasks between 5 and 15
+tasks for each one randomly distributed into different states of completion. Make sure that there's at least
+one task in each stage of completion.
+```
