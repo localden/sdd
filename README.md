@@ -82,7 +82,7 @@ You can use this repository as a template to get started with Claude Code and SD
 
 1. Clone this repository.
 1. Launch Claude Code from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).
-1. Start iterating on the capabilities of your project.
+1. Start iterating on the project following the steps below.
 
 ### STEP 1: Bootstrap the project
 
