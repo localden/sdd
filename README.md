@@ -60,15 +60,13 @@ to bootstrap a new feature or create an execution plan for Claude Code to follow
 
 ## 🤖 Claude Code Integration
 
-### Key Claude Code Patterns
-
 You can use this repository as a template to get started with Claude Code and SDD.
 
 1. Clone this repository.
 1. Launch Claude Code from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).
 1. Start iterating on the capabilities of your project.
 
-#### STEP 1: Bootstrap the project
+### STEP 1: Bootstrap the project
 
 The first step should be creating a new project scaffolding. Use `/new_feature` and then specify the concrete requirements for the project you want to develop.
 
@@ -97,3 +95,7 @@ assigned to you, the currently logged in user, in a different color from all the
 see yours. You can edit any comments that you make, but you can't edit comments that other people made. You can
 delete any comments that you made, but you can't delete comments anybody else made.
 ```
+
+After this prompt is entered, you should see Claude Code kick off the planning and spec drafting process.
+
+![Claude Code performing the planning and spec writing steps](media/new-feature-process.png)
