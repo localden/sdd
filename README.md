@@ -3,7 +3,7 @@
 >[!NOTE]
 >This is heavily based on [**work done by John Lam**](https://github.com/jflam/sdd).
 
-This effort is a core part of our **EVERGREEN** app (incubation) workstream. 
+This effort is a core part of our **EVERGREEN** app (incubation) workstream. This is part ONE of a series of parallel projects in this workstream. What we describe here is a GREENFIELD app generation (frm scratch). Further experiments will extend to begin with BROWNFIELD apps.
 
 This repository contains the foundational documentation and tools for adopting and implementing Spec-Driven Development (SDD) - a methodology that inverts the traditional relationship between specifications and code by making specifications the primary artifact that generates implementation(s). SDD is fundamentally a "process" that uses specialized templates for accomplishing the "new_feature" task. It can be generatlized, but the commands and flow in this repo are geared towards defining a rich specification and implementation plans based on _guardrails_ (or constitutions that are core principles) _and NOT build the code in a one-shot from user-prompt_. The system relies **heavily** on the capabilities of the underlying model/Agent.
 
@@ -23,6 +23,7 @@ Our experiments therefore are to:
 - Prove the creativity concept, of parallel implementations.
 - Provide the iterative multi-step or iterative process, to create new features etc.
 - Modify the process to prove generalization, such as "upgrade" tasks or "modernization" tasks.
+- Prove the process for BROWNFIELD apps - starting with the upgrade process or modernization process, and to understand changes to the spec generation and needs for assessing the current app.  
 
 ## Table of Contents
 
