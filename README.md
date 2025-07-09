@@ -131,3 +131,39 @@ We are going to generate this using .NET Aspire, using Postgres as the database.
 Blazor server with drag-and-drop task boards, real-time updates. There shoul dbe a REST API created with a projects API,
 tasks API, and a notifications API.
 ```
+
+The output of this step will include a number of implementation detail documents, with your directory tree resembling this:
+
+```text
+.
+├── base
+│		 ├── CLAUDE.md
+│		 ├── memory
+│		 │		 └── constitution.md
+│		 └── templates
+│		     ├── feature-spec-template.md
+│		     └── implementation-plan-template.md
+├── gen.sh
+├── media
+│		 ├── claude-code-starter.gif
+│		 └── generate-plan.gif
+├── README.md
+├── sdd.md
+├── specify-proposal.md
+└── specs
+    └── 001-create-taskify
+        ├── feature-spec.md
+        ├── implementation-details
+        │		 ├── 00-research.md
+        │		 ├── 01-environment-setup.md
+        │		 ├── 02-data-model.md
+        │		 ├── 03-api-contracts.md
+        │		 ├── 04-algorithms.md
+        │		 ├── 05-integrations.md
+        │		 ├── 06-contract-tests.md
+        │		 ├── 07-integration-tests.md
+        │		 └── 08-inter-library-tests.md
+        ├── implementation-plan.md
+        └── manual-testing.md
+
+```
