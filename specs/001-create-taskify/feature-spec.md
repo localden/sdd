@@ -68,6 +68,10 @@ Teams need a simple, visual way to track project progress and coordinate task as
   - **Journey**: View project list → See task counts per column → Identify bottlenecks or progress
   - **Test**: Verify counts update as tasks move between columns
 
+- **US-006**: As a team member, I want to explore different project types and activity levels so that I can understand various workflow scenarios
+  - **Journey**: Browse projects → View "Mobile App Redesign" (high activity) → See many active tasks → Switch to "Team Onboarding System" (low activity) → See mostly completed tasks
+  - **Test**: Verify each project shows distinct activity patterns and realistic task distributions
+
 ### Critical Test Scenarios
 - **Error Recovery**: Task drag operations fail gracefully, comments save properly or show error, task assignments revert if update fails
 - **Performance**: Drag and drop operations respond within 100ms, project loading completes within 2 seconds
@@ -81,16 +85,30 @@ Teams need a simple, visual way to track project progress and coordinate task as
 - **FR-001**: System MUST display five predefined users (1 product manager, 4 engineers) for selection
 - **FR-002**: System MUST persist user selection throughout session and display assigned tasks in distinct color
 - **FR-003**: System MUST display three sample projects with task counts per Kanban column
-- **FR-004**: System MUST support drag-and-drop task movement between columns (To Do, In Progress, In Review, Done)
-- **FR-005**: System MUST allow unlimited comments per task with author identification and timestamps
-- **FR-006**: System MUST allow users to edit/delete only their own comments
-- **FR-007**: System MUST allow task reassignment to any of the five predefined users
-- **FR-008**: System MUST visually distinguish tasks assigned to current user from other tasks
+- **FR-004**: System MUST pre-populate projects with realistic task distributions: Project 1 (21 tasks), Project 2 (20 tasks), Project 3 (20 tasks)
+- **FR-005**: System MUST distribute tasks across all four Kanban columns (To Do, In Progress, In Review, Done) with varying completion states
+- **FR-006**: System MUST assign tasks to different users to demonstrate workload distribution and assignment scenarios
+- **FR-007**: System MUST support drag-and-drop task movement between columns (To Do, In Progress, In Review, Done)
+- **FR-008**: System MUST allow unlimited comments per task with author identification and timestamps
+- **FR-009**: System MUST allow users to edit/delete only their own comments
+- **FR-010**: System MUST allow task reassignment to any of the five predefined users
+- **FR-011**: System MUST visually distinguish tasks assigned to current user from other tasks
 
 ### Key Entities *(include if feature involves data)*
 - **User**: Represents team members with name, role (Product Manager/Engineer), and ID for task assignment
+  - Sarah Chen (Product Manager)
+  - Alex Rodriguez (Senior Engineer)
+  - Jordan Kim (Engineer)
+  - Taylor Swift (Engineer)
+  - Morgan Davis (Engineer)
 - **Project**: Container for tasks with title, description, and task collection organized by status
+  - Mobile App Redesign (high activity, 21 tasks)
+  - API Integration Platform (moderate activity, 20 tasks)
+  - Team Onboarding System (low activity, 20 tasks)
 - **Task**: Work item with title, description, status (To Do/In Progress/In Review/Done), assignee, and comment collection
+  - Each task must have realistic titles and descriptions appropriate to its project context
+  - Tasks must be distributed across all four status columns to demonstrate workflow progression
+  - Task assignments must vary across users to show different workload scenarios
 - **Comment**: User feedback on tasks with content, author, timestamp, and edit/delete permissions
 
 ### Non-Functional Requirements *(optional - only if performance/scale critical or storing user data)*
@@ -109,7 +127,9 @@ Teams need a simple, visual way to track project progress and coordinate task as
 ### Functional Validation
 - [ ] All user stories pass acceptance testing
 - [ ] All functional requirements work end-to-end
-- [ ] External integrations verified in test environment
+- [ ] Sample projects display with correct task counts and distributions
+- [ ] Tasks are properly assigned to different users with realistic workload scenarios
+- [ ] All three project activity levels (high, moderate, low) are clearly demonstrated
 
 ### Technical Validation
 - [ ] Performance: Task drag operations complete within 100ms
@@ -121,6 +141,9 @@ Teams need a simple, visual way to track project progress and coordinate task as
 - [ ] Users can update task status 5x faster than traditional form-based systems
 - [ ] Team members can identify their assigned tasks within 2 seconds of project load
 - [ ] Comment-based collaboration reduces need for external communication tools
+- [ ] Sample projects demonstrate realistic team workflows with 61 total tasks across 3 projects
+- [ ] Task distribution shows clear project lifecycle stages (high activity → moderate → maintenance)
+- [ ] User workload variation demonstrates practical team assignment scenarios
 
 ---
 
@@ -128,12 +151,41 @@ Teams need a simple, visual way to track project progress and coordinate task as
 
 ### In Scope
 - User selection from predefined list (5 users: 1 PM, 4 engineers)
-- Three sample projects with pre-populated tasks
+- Three sample projects with pre-populated tasks in various completion states
 - Kanban board with four columns (To Do, In Progress, In Review, Done)
 - Drag-and-drop task status management
 - Task commenting system with author permissions
 - Task assignment and reassignment functionality
 - Visual distinction for current user's assigned tasks
+
+### Sample Projects and Task Distribution
+The system must include three pre-populated sample projects that demonstrate realistic task workflows:
+
+#### Project 1: "Mobile App Redesign" (High Activity)
+- **To Do** (6 tasks): User research survey, Wireframe creation, Icon design, Color palette selection, Accessibility review, Performance testing
+- **In Progress** (4 tasks): Prototype development, User testing coordination, Design system documentation, Development handoff preparation
+- **In Review** (3 tasks): Navigation flow review, Visual design approval, Usability testing results
+- **Done** (8 tasks): Stakeholder interviews, Competitive analysis, Brand guidelines review, Initial sketches, User persona creation, Technical constraints analysis, Design principles document, Project kickoff meeting
+
+#### Project 2: "API Integration Platform" (Moderate Activity)
+- **To Do** (4 tasks): Documentation writing, Error handling implementation, Rate limiting setup, Monitoring dashboard
+- **In Progress** (2 tasks): Authentication service integration, Database schema migration
+- **In Review** (2 tasks): Security audit, Performance benchmarking
+- **Done** (12 tasks): Requirements gathering, API design specification, Database design, Authentication research, Third-party service evaluation, Integration planning, Development environment setup, Code review guidelines, Testing framework setup, CI/CD pipeline configuration, Initial API endpoints, Basic error handling
+
+#### Project 3: "Team Onboarding System" (Low Activity - Maintenance Phase)
+- **To Do** (2 tasks): Quarterly review preparation, Knowledge base cleanup
+- **In Progress** (1 task): Feedback survey analysis
+- **In Review** (1 task): Process documentation update
+- **Done** (16 tasks): New hire workflow mapping, Documentation template creation, Training material development, Video tutorial recording, Checklist creation, Mentor assignment process, HR system integration, Progress tracking setup, Feedback collection system, Welcome email automation, Resource link compilation, Department-specific guides, Manager training materials, Success metrics definition, Pilot program execution, System rollout completion
+
+### Task Assignment Distribution
+Tasks should be distributed across the five predefined users to demonstrate various workload scenarios:
+- **Sarah Chen (Product Manager)**: Primarily assigned strategy, planning, and review tasks across all projects
+- **Alex Rodriguez (Senior Engineer)**: Heavy workload with complex technical tasks, some in progress
+- **Jordan Kim (Engineer)**: Moderate workload with mix of development and testing tasks
+- **Taylor Swift (Engineer)**: Light workload with focus on documentation and maintenance
+- **Morgan Davis (Engineer)**: Balanced workload with recent task completions and new assignments
 
 ### Out of Scope
 - User authentication/login system
