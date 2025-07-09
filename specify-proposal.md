@@ -1,5 +1,3 @@
-sdd-proposal.md
-
 # Building Specify: A Proposal for Specification-Driven Development
 
 ## The Power Inversion

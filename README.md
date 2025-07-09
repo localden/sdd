@@ -14,6 +14,13 @@ SDD represents a fundamental shift in software development where:
 - **Documentation and code stay synchronized** (through continuous regeneration)
 - **Changes propagate systematically** (from specification to implementation)
 
+## 🔧 Prerequisites
+
+To use this repository effectively:
+
+- **Linux** (can be used via [WSL2](https://learn.microsoft.com/windows/wsl/install)) or **macOS** operating system
+- [Claude Code](https://www.anthropic.com/claude-code)
+
 ## 📁 Repository Structure
 
 ```text
@@ -61,15 +68,32 @@ You can use this repository as a template to get started with Claude Code and SD
 1. Launch Claude Code from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).
 1. Start iterating on the capabilities of your project.
 
-#### New features
+#### STEP 1: Bootstrap the project
 
-The first step should be creating a new feature. Use `/new_feature` and then specify the concrete requirements for the project you want to develop.
+The first step should be creating a new project scaffolding. Use `/new_feature` and then specify the concrete requirements for the project you want to develop.
 
 ![GIF showing Claude Code execution in an Ubuntu terminal](media/claude-code-starter.gif)
 
-## 🔧 Prerequisites
+>[!IMPORTANT]
+>Be as explicit as possible about what you are trying to build.
 
-To use this repository effectively:
+An example prompt, as described by John Lam, can be:
 
-- **Linux** (can be used via [WSL2](https://learn.microsoft.com/windows/wsl/install)) or **macOS** operating system
-- [Claude Code](https://www.anthropic.com/claude-code)
+```text
+Develop Taskify, a team productivity platform. It should allow users to create projects, add team members,
+assign tasks, comment and move tasks between boards in Kanban style. In this initial phase for this feature,
+let's call it "Create Taskify," let's have multiple users but the users will be declared ahead of time, predefined.
+I want five users in two different categories, one product manager and four engineers. Let's create three
+different sample projects. Let's have the standard Kanban columns for the status of each task, such as "To Do,"
+"In Progress," "In Review," and "Done." There will be no login for this application as this is just the very
+first testing thing to ensure that our basic features are set up. For each task in the UI for a task card,
+you should be able to change the current status of the task between the different columns in the Kanban work board.
+You should be able to leave an unlimited number of comments for a particular card. You should be able to, from that task
+card, assign one of the valid users. When you first launch Taskify, it's going to give you a list of the five users to pick
+from. There will be no password required. When you click on a user, you go into the main view, which displays the list of
+projects. When you click on a project, you open the Kanban board for that project. You're going to see the columns.
+You'll be able to drag and drop cards back and forth between different columns. You will see any cards that are
+assigned to you, the currently logged in user, in a different color from all the other ones, so you can quickly
+see yours. You can edit any comments that you make, but you can't edit comments that other people made. You can
+delete any comments that you made, but you can't delete comments anybody else made.
+```
