@@ -115,3 +115,6 @@ For each sample project or project that you create there should be a variable nu
 tasks for each one randomly distributed into different states of completion. Make sure that there's at least
 one task in each stage of completion.
 ```
+
+>[!IMPORTANT]
+>You should also ask Claude Code to validate the **Review & Acceptance Checklist**, checking off the things that are validated/pass the requirements, and leave the ones that are not unchecked.
