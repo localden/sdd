@@ -3,7 +3,26 @@
 >[!NOTE]
 >This is heavily based on [**work done by John Lam**](https://github.com/jflam/sdd).
 
-This repository contains the foundational documentation and tools for adopting and implementing Spec-Driven Development (SDD) - a methodology that inverts the traditional relationship between specifications and code by making specifications the primary artifact that generates implementation(s).
+This effort is a core part of our **EVERGREEN** app (incubation) workstream. 
+
+This repository contains the foundational documentation and tools for adopting and implementing Spec-Driven Development (SDD) - a methodology that inverts the traditional relationship between specifications and code by making specifications the primary artifact that generates implementation(s). SDD is fundamentally a "process" that uses specialized templates for accomplishing the "new_feature" task. It can be generatlized, but the commands and flow in this repo are geared towards defining a rich specification and implementation plans based on _guardrails_ (or constitutions that are core principles) _and NOT build the code in a one-shot from user-prompt_. The system relies **heavily** on the capabilities of the underlying model/Agent.
+
+Our goal in this repo is to provide the foundational components that include the ability to create spec's and imprelementations, so that users can experiment with **REAL** applications.
+
+It is important to realize that the conceptual process here is geared towards a 0-t0-1 process. That means start from scratch, define a high-level, user-prompt, refine, create the implementation plan, refine, and then create the app code. However, the conceptual approach has these goals, (and therefore experiments in mind):
+
+- **0-to-1** : Scratch to app code implementation
+- **0-to-1, 1', 1'', 1''', ..** : Scratch to various, parallel app code implementations to support creativity.
+-** 0-to-1, -to-2, -to-3, to-N **: Scratch to app code (or parallel implementations), then add new features in an iterative manner.
+
+Our experiments therefore are to:
+
+- Create apps using various technology stacks, as this is intended to be independent of that. This is a process.
+- Create apps that are **mission-critical** and demonstrate that we can include _organizational _constraints, such as a preferred Cloud provider, preferred stack, eng practices, or design-languages.
+- Create apps that are built for and by different user cohorts, given their preference, e.g. vibe-coder/Cloud or AI-native (start with vibe and use as input to SDD).
+- Prove the creativity concept, of parallel implementations.
+- Provide the iterative multi-step or iterative process, to create new features etc.
+- Modify the process to prove generalization, such as "upgrade" tasks or "modernization" tasks.
 
 ## Table of Contents
 
@@ -22,7 +41,7 @@ This repository contains the foundational documentation and tools for adopting a
 
 ## 🎯 Overview
 
-SDD represents a fundamental shift in software development where:
+SDD represents a fundamental shift in the process of software development where inversion is geared towards **intent-driven** development, and code is secondary. Fundamentally it means:
 
 - **Specifications drive code** (not the other way around)
 - **PRDs become executable** (generating implementation directly)
@@ -91,7 +110,7 @@ The first step should be creating a new project scaffolding. Use `/new_feature` 
 ![GIF showing Claude Code execution in an Ubuntu terminal](media/claude-code-starter.gif)
 
 >[!IMPORTANT]
->Be as explicit as possible about what you are trying to build.
+>Be as explicit as possible about what you are trying to build. Typically, you might want to consider voice interaction with the model.
 
 An example prompt, as described by John Lam, can be:
 
