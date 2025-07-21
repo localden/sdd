@@ -30,9 +30,9 @@ SDD is a structured process that emphasizes:
 
 | Phase | Focus | Key Activities |
 | --- | --- | --- |
-| **0-to-1 Development** (Greenfield) | Generate from scratch | Start with high-level requirements • Generate specifications • Plan implementation steps • Build production-ready applications |
-| **Creative Exploration** | Parallel implementations | Explore diverse solutions • Support multiple technology stacks & architectures • Experiment with UX patterns |
-| **Iterative Enhancement** ("Brownfield") | Brownfield modernization | Add features iteratively • Modernize legacy systems • Adapt processes |
+| **0-to-1 Development** ("Greenfield") | Generate from scratch | <ul><li>Start with high-level requirements</li><li>Generate specifications</li><li>Plan implementation steps</li><li>Build production-ready applications</li></ul> |
+| **Creative Exploration** | Parallel implementations | <ul><li>Explore diverse solutions</li><li>Support multiple technology stacks & architectures</li><li>Experiment with UX patterns</li></ul> |
+| **Iterative Enhancement** ("Brownfield") | Brownfield modernization | <ul><li>Add features iteratively</li><li>Modernize legacy systems</li><li>Adapt processes</li></ul> |
 
 ## 🎯 Experimental Goals
 
