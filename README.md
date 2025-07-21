@@ -15,7 +15,7 @@
 
 ## 🎯 What is SDD?
 
-Specification-Driven Development (SDD) fundamentally **inverts** the traditional relationship between specifications and code. Instead of code driving documentation, specifications become the primary artifact that generates implementations.
+Specification-Driven Development (SDD) **flips the script** on traditional software development. For decades, code has been king — specifications were just scaffolding we built and discarded once the "real work" of coding began. SDD changes this: **specifications become executable**, directly generating working implementations rather than just guiding them.
 
 ### Core Philosophy
 
