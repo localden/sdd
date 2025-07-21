@@ -82,7 +82,11 @@ Our research and experimentation focus on:
 To use this repository effectively:
 
 - **Linux** (can be used via [WSL2](https://learn.microsoft.com/windows/wsl/install)) or **macOS** operating system
-- [Claude Code](https://www.anthropic.com/claude-code)
+- Agentic AI developer tools:
+    - [Visual Studio Code](https://code.visualstudio.com/)
+    - [Claude Code](https://www.anthropic.com/claude-code)
+    - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+    - [Codex CLI](https://help.openai.com/en/articles/11096431-openai-codex-cli-getting-started)
 
 ## 📁 Repository Structure
 
@@ -101,8 +105,11 @@ To use this repository effectively:
         └── implementation-plan-template.md  # Template for implementation plans
 ```
 
+>[!NOTE]
+>While the structure above uses `CLAUDE.md` for Claude Code, the pattern is applicable to _any_ modern agentic AI tool.
+
 >[!IMPORTANT]
->One of the key components for Claude Code is the **constitution file**, which defines non-negotiable principles that it must follow when building the application. It defines the key tenets that must not be violated through _any_ of the steps in the process.
+>One of the key components for the AI tools is the **constitution file**, which defines non-negotiable principles that it must follow when building the application. It defines the key tenets that must not be violated through _any_ of the steps in the process.
 
 ## 🚀 Quick Start for Claude Code Users
 
