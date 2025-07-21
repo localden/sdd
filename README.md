@@ -1,4 +1,4 @@
-<div align="center">
+<div align="center>
     <h1>🚀 Specification-Driven Development (SDD)</h1>
     <h3><em>Transforming intent into reality</em></h3>
 </div>
@@ -7,11 +7,28 @@
     <strong>An effort to fundamentally invert the traditional relationship between specifications and code.</strong>
 </p>
 
+>[!NOTE]
+>This repository is heavily influenced by and based on the work of [John Lam](https://github.com/jflam).
 
 ---
 
-> [!NOTE]
-> This repository is heavily based on [**foundational work by John Lam**](https://github.com/jflam/sdd) and represents a core component of our incubation workstream.
+## Table of Contents
+
+- [🎯 What is SDD?](#-what-is-sdd)
+- [📚 Core Philosophy](#-core-philosophy)
+- [🌟 Development Phases](#-development-phases)
+- [🎯 Experimental Goals](#-experimental-goals)
+- [🔧 Prerequisites](#-prerequisites)
+- [📁 Repository Structure](#-repository-structure)
+- [🚀 Quick Start for Claude Code Users](#-quick-start-for-claude-code-users)
+  - [1. Understanding the Methodology](#1-understanding-the-methodology)
+  - [2. Using the Templates](#2-using-the-templates)
+- [🤖 Claude Code Integration](#-claude-code-integration)
+  - [STEP 1: Bootstrap the project](#step-1-bootstrap-the-project)
+  - [STEP 2: Functional specification clarification](#step-2-functional-specification-clarification)
+  - [STEP 3: Generate a plan](#step-3-generate-a-plan)
+  - [STEP 4: Have Claude Code validate the plan](#step-4-have-claude-code-validate-the-plan)
+  - [STEP 5: Implementation](#step-5-implementation)
 
 ## 🎯 What is SDD?
 
@@ -59,30 +76,6 @@ Our research and experimentation focus on:
 - Validate the concept of parallel implementation exploration
 - Provide robust iterative feature development workflows
 - Extend processes to handle upgrades and modernization tasks  
-
-## Table of Contents
-
-- [🎯 Overview](#-overview)
-- [🔧 Prerequisites](#-prerequisites)
-- [📁 Repository Structure](#-repository-structure)
-- [🚀 Quick Start for Claude Code Users](#-quick-start-for-claude-code-users)
-  - [1. Understanding the Methodology](#1-understanding-the-methodology)
-  - [2. Using the Templates](#2-using-the-templates)
-- [🤖 Claude Code Integration](#-claude-code-integration)
-  - [STEP 1: Bootstrap the project](#step-1-bootstrap-the-project)
-  - [STEP 2: Functional specification clarification](#step-2-functional-specification-clarification)
-  - [STEP 3: Generate a plan](#step-3-generate-a-plan)
-  - [STEP 4: Have Claude Code validate the plan](#step-4-have-claude-code-validate-the-plan)
-  - [STEP 5: Implementation](#step-5-implementation)
-
-## 🎯 Overview
-
-SDD represents a fundamental shift in the process of software development where inversion is geared towards **intent-driven** development, and code is secondary. Fundamentally it means:
-
-- **Specifications drive code** (not the other way around)
-- **PRDs become executable** (generating implementation directly)
-- **Documentation and code stay synchronized** (through continuous regeneration)
-- **Changes propagate systematically** (from specification to implementation)
 
 ## 🔧 Prerequisites
 
