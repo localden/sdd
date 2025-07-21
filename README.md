@@ -28,32 +28,11 @@ SDD is a structured process that emphasizes:
 
 ## 🌟 Development Phases
 
-This repository supports three distinct development approaches:
-
-### Phase 1: 0-to-1 Development
-
-**Greenfield application generation from scratch**
-
-- Start with high-level user requirements
-- Generate comprehensive specifications
-- Create implementation plans
-- Build production-ready applications
-
-### Phase 2: Creative Exploration
-
-**Multiple parallel implementations**
-
-- **0-to-1, 1', 1'', 1'''...** - Generate various parallel implementations to explore creative solutions
-- Support different technology stacks and architectural approaches
-- Enable experimentation with different user experience patterns
-
-### Phase 3: Iterative Enhancement
-
-**Feature evolution and brownfield modernization**
-
-- **0-to-1-to-2-to-3-to-N** - Add new features iteratively to existing applications
-- Support upgrade and modernization tasks for legacy applications
-- Adapt the process for brownfield application enhancement
+| Phase | Focus | Key Activities |
+| --- | --- | --- |
+| **0-to-1 Development** (Greenfield) | Generate from scratch | Start with high-level requirements • Generate specifications • Plan implementation steps • Build production-ready applications |
+| **Creative Exploration** | Parallel implementations | Explore diverse solutions • Support multiple technology stacks & architectures • Experiment with UX patterns |
+| **Iterative Enhancement** ("Brownfield") | Brownfield modernization | Add features iteratively • Modernize legacy systems • Adapt processes |
 
 ## 🎯 Experimental Goals
 
