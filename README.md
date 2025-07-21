@@ -1,4 +1,4 @@
-<div align="center>
+<div align="center">
     <h1>🚀 Specification-Driven Development (SDD)</h1>
     <h3><em>Transforming intent into reality</em></h3>
 </div>
