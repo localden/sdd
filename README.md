@@ -1,6 +1,12 @@
-# 📋 Specification-Driven Development (SDD)
+<div align="center">
+    <h1>🚀 Specification-Driven Development (SDD)</h1>
+    <h3><em>Transforming intent into reality</em></h3>
+</div>
 
-> A methodology that puts specifications first, making them the primary artifact that drives implementation
+<p align="center">
+    <strong>An effort to fundamentally invert the traditional relationship between specifications and code.</strong>
+</p>
+
 
 ---
 
