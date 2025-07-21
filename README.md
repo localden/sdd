@@ -111,33 +111,37 @@ To use this repository effectively:
 >[!IMPORTANT]
 >One of the key components for the AI tools is the **constitution file**, which defines non-negotiable principles that it must follow when building the application. It defines the key tenets that must not be violated through _any_ of the steps in the process.
 
-## 🚀 Quick Start for Claude Code Users
+## 🚀 Quick Start
 
-### 1. Understanding the Methodology
+### Understanding the Methodology
 
 Start by reading the core documents to familiarize yourself with the principles:
 
 1. **`sdd.md`** - The complete SDD methodology.
 2. **`specify-proposal.md`** - Vision for tooling to support SDD.
-3. **`base/memory/constitution.md`** - Core development principles that **must be followed by Claude Code**.
+3. **`base/memory/constitution.md`** - Core development principles that **must be followed by the coding agent**.
 
-### 2. Using the Templates
+### Using the Templates
 
 The `base/templates/` directory contains structured templates for:
 
 - **Feature Specifications** - Business requirements and user stories
 - **Implementation Plans** - Technical architecture and development approach
 
-Similarly, the `base/.claude` directory contains Claude Code-specific `/` (slash) commands - `new_feature` and `generate_plan`, that can be used
+>[!NOTE]
+The `base/.claude` directory contains Claude Code-specific `/` (slash) commands - `new_feature` and `generate_plan`, that can be used
 to bootstrap a new feature or create an execution plan for Claude Code to follow based on a feature definition.
 
-## 🤖 Claude Code Integration
+## 🤖 Agent Integration
 
-You can use this repository as a template to get started with Claude Code and SDD.
+You can use this repository as a template to get started with your preferred AI agent and SDD.
 
 1. Clone this repository.
-1. Launch Claude Code from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).
+1. Launch the agent from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).
 1. Start iterating on the project following the steps below.
+
+>[!IMPORTANT]
+>You can use alternative agent instruction files, like `GEMINI.md` for Gemini CLI and `AGENTS.md` for Codex CLI.
 
 ### STEP 1: Bootstrap the project
 
