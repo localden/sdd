@@ -74,7 +74,19 @@ jobs:
           echo "Copied scripts folder"
         fi
         
-        # Only copy the three required folders - no root files
+        if [ -d ".gemini" ]; then
+          cp -r .gemini sdd-package/
+          echo "Copied .gemini folder"
+        fi
+        
+        # Copy Copilot instructions to .github folder in package
+        if [ -d ".copilot" ]; then
+          mkdir -p sdd-package/.github
+          cp -r .copilot/* sdd-package/.github/
+          echo "Copied Copilot instructions to .github folder"
+        fi
+        
+        # Only copy the specified folders - no root files
         
         # Create tarball
         tar -czf sdd-template-${{ steps.get_tag.outputs.new_version }}.tar.gz -C sdd-package .
@@ -108,20 +120,22 @@ jobs:
         
         ## 📦 Package Contents
         - \`.claude/\` - Claude Code commands for SDD workflow
+        - \`.gemini/\` - Gemini CLI commands for SDD workflow
+        - \`.github/\` - GitHub Copilot instructions for SDD workflow
         - \`memory/\` - Constitutional AI memory and guidelines
         - \`scripts/\` - Shell scripts for project automation
         
         ## 🚀 Usage
         1. Download and extract the template
         2. Follow the setup instructions in README.md
-        3. Use the provided Claude commands to start your SDD journey
+        3. Use the provided AI commands to start your SDD journey
         
         ## 📝 Changes in this release
         $COMMITS
         
         ## 🔧 Requirements
         - Python 3.11+
-        - Claude Code (recommended)
+        - AI coding assistant (Claude Code, Gemini CLI, or GitHub Copilot)
         - Git
         - GitHub CLI (optional)
         EOF

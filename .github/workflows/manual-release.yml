@@ -89,6 +89,22 @@ jobs:
           echo "⚠️ scripts folder not found"
         fi
         
+        if [ -d ".gemini" ]; then
+          cp -r .gemini sdd-package/
+          echo "✓ Copied .gemini folder ($(find .gemini -type f | wc -l) files)"
+        else
+          echo "⚠️ .gemini folder not found"
+        fi
+        
+        # Copy Copilot instructions to .github folder in package
+        if [ -d ".copilot" ]; then
+          mkdir -p sdd-package/.github
+          cp -r .copilot/* sdd-package/.github/
+          echo "✓ Copied Copilot instructions to .github folder ($(find .copilot -type f | wc -l) files)"
+        else
+          echo "⚠️ .copilot folder not found"
+        fi
+        
         # Only copy the three required folders - no root files
         
         # Create both archive formats
@@ -114,6 +130,8 @@ jobs:
         
         # Count files in each directory
         CLAUDE_COUNT=$(find .claude -type f 2>/dev/null | wc -l || echo "0")
+        GEMINI_COUNT=$(find .gemini -type f 2>/dev/null | wc -l || echo "0")
+        COPILOT_COUNT=$(find .copilot -type f 2>/dev/null | wc -l || echo "0")
         MEMORY_COUNT=$(find memory -type f 2>/dev/null | wc -l || echo "0")
         SCRIPTS_COUNT=$(find scripts -type f 2>/dev/null | wc -l || echo "0")
         
@@ -127,6 +145,8 @@ jobs:
         | Component | Files | Description |
         |-----------|--------|-------------|
         | \`.claude/\` | $CLAUDE_COUNT | Claude Code commands for SDD workflow |
+        | \`.gemini/\` | $GEMINI_COUNT | Gemini CLI commands for SDD workflow |
+        | \`.github/\` | $COPILOT_COUNT | GitHub Copilot instructions for SDD workflow |
         | \`memory/\` | $MEMORY_COUNT | Constitutional AI memory and development guidelines |
         | \`scripts/\` | $SCRIPTS_COUNT | Shell scripts for project automation |
         
@@ -143,7 +163,10 @@ jobs:
         ## 🔧 Prerequisites
         
         - Python 3.11+
-        - [Claude Code](https://claude.ai/code) (recommended)
+        - AI coding assistant:
+          * [Claude Code](https://claude.ai/code) - Use \`.claude/\` commands
+          * [Gemini CLI](https://ai.google.dev/gemini-api/docs/cli) - Use \`.gemini/\` commands
+          * [GitHub Copilot](https://github.com/features/copilot) - Use \`.github/\` instructions
         - Git
         - [UV](https://docs.astral.sh/uv/) package manager
         - [GitHub CLI](https://cli.github.com/) (optional)
