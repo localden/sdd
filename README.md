@@ -81,60 +81,53 @@ Our research and experimentation focus on:
 
 To use this repository effectively:
 
-- **Linux** (can be used via [WSL2](https://learn.microsoft.com/windows/wsl/install)) or **macOS** operating system
 - Agentic AI developer tools:
     - [Visual Studio Code](https://code.visualstudio.com/)
     - [Claude Code](https://www.anthropic.com/claude-code)
     - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
     - [Codex CLI](https://help.openai.com/en/articles/11096431-openai-codex-cli-getting-started)
 
-## 📁 Repository Structure
-
-```text
-/
-├── README.md                    # This file - how to use the repository
-├── sdd.md                       # Core SDD methodology document
-├── specify-proposal.md          # Proposal for the Specify tool
-├── gen.sh                       # Markdown to Word converter
-└── base/                        # Core templates and constitution
-    ├── CLAUDE.md                # Claude Code specific instructions
-    ├── memory/
-    │   └── constitution.md      # Immutable development principles
-    └── templates/
-        ├── feature-spec-template.md         # Template for feature specifications
-        └── implementation-plan-template.md  # Template for implementation plans
-```
-
 >[!NOTE]
->While the structure above uses `CLAUDE.md` for Claude Code, the pattern is applicable to _any_ modern agentic AI tool.
+>While the repository uses Claude Code conventions, the pattern is applicable to _any_ modern agentic AI tool.
 
 >[!IMPORTANT]
 >One of the key components for the AI tools is the **constitution file**, which defines non-negotiable principles that it must follow when building the application. It defines the key tenets that must not be violated through _any_ of the steps in the process.
 
 ## 🚀 Quick Start
 
-### Understanding the Methodology
+### Understanding the methodology
 
 Start by reading the core documents to familiarize yourself with the principles:
 
 1. **`sdd.md`** - The complete SDD methodology.
 2. **`specify-proposal.md`** - Vision for tooling to support SDD.
-3. **`base/memory/constitution.md`** - Core development principles that **must be followed by the coding agent**.
 
-### Using the Templates
+### Using the CLI
 
-The `base/templates/` directory contains structured templates for:
+>[!IMPORTANT]
+>This documentation is being written as the tool is being re-designed. **Stay tuned in a few hours!**
 
-- **Feature Specifications** - Business requirements and user stories
-- **Implementation Plans** - Technical architecture and development approach
+#### Option 1: Using uvx (No Installation)
 
->[!NOTE]
-The `base/.claude` directory contains Claude Code-specific `/` (slash) commands - `new_feature` and `generate_plan`, that can be used
-to bootstrap a new feature or create an execution plan for Claude Code to follow based on a feature definition.
+```bash
+# Run directly without installing anything
+uvx --from git+https://github.com/localden/sdd.git specify init my-project
+```
 
-## 🤖 Agent Integration
+#### Option 2: Install Globally
 
-You can use this repository as a template to get started with your preferred AI agent and SDD.
+```bash
+# Install the Specify CLI tool globally
+uv tool install git+https://github.com/localden/sdd.git
+
+# Now use it anywhere
+specify init <project-name>
+specify check  # Verify all tools are installed
+```
+
+### Repository as a template
+
+You can also use this repository as a template to get started with your preferred AI agent and SDD.
 
 1. Clone this repository.
 1. Launch the agent from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).

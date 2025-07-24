@@ -1,0 +1,181 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  manual_release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Calculate new version
+      id: version
+      run: |
+        # Get the latest tag, or use v0.0.0 if no tags exist
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        
+        # Extract version number
+        VERSION=$(echo $LATEST_TAG | sed 's/v//')
+        IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
+        MAJOR=${VERSION_PARTS[0]:-0}
+        MINOR=${VERSION_PARTS[1]:-0}
+        PATCH=${VERSION_PARTS[2]:-0}
+        
+        # Increment based on input
+        case "${{ github.event.inputs.version_bump }}" in
+          "major")
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            ;;
+          "minor")
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            ;;
+          "patch")
+            PATCH=$((PATCH + 1))
+            ;;
+        esac
+        
+        NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "New version will be: $NEW_VERSION (was $LATEST_TAG)"
+        
+    - name: Create release package
+      run: |
+        # Create a temporary directory for the package
+        mkdir -p sdd-package
+        
+        # Copy the required folders with better error handling
+        echo "Packaging SDD components..."
+        
+        if [ -d ".claude" ]; then
+          cp -r .claude sdd-package/
+          echo "✓ Copied .claude folder ($(find .claude -type f | wc -l) files)"
+        else
+          echo "⚠️ .claude folder not found"
+        fi
+        
+        if [ -d "memory" ]; then
+          cp -r memory sdd-package/
+          echo "✓ Copied memory folder ($(find memory -type f | wc -l) files)"
+        else
+          echo "⚠️ memory folder not found"
+        fi
+        
+        if [ -d "scripts" ]; then
+          cp -r scripts sdd-package/
+          echo "✓ Copied scripts folder ($(find scripts -type f | wc -l) files)"
+        else
+          echo "⚠️ scripts folder not found"
+        fi
+        
+        # Only copy the three required folders - no root files
+        
+        # Create both archive formats
+        tar -czf sdd-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-package .
+        cd sdd-package && zip -r ../sdd-${{ steps.version.outputs.new_version }}.zip . && cd ..
+        
+        echo ""
+        echo "📦 Package created with contents:"
+        tar -tzf sdd-${{ steps.version.outputs.new_version }}.tar.gz | head -20
+        
+    - name: Generate detailed release notes
+      run: |
+        LAST_TAG=${{ steps.version.outputs.latest_tag }}
+        
+        # Get commit range
+        if [ "$LAST_TAG" = "v0.0.0" ]; then
+          COMMIT_RANGE="HEAD~10..HEAD"
+          COMMITS=$(git log --oneline --pretty=format:"- %s" $COMMIT_RANGE 2>/dev/null || echo "- Initial release")
+        else
+          COMMIT_RANGE="$LAST_TAG..HEAD"
+          COMMITS=$(git log --oneline --pretty=format:"- %s" $COMMIT_RANGE 2>/dev/null || echo "- No changes since last release")
+        fi
+        
+        # Count files in each directory
+        CLAUDE_COUNT=$(find .claude -type f 2>/dev/null | wc -l || echo "0")
+        MEMORY_COUNT=$(find memory -type f 2>/dev/null | wc -l || echo "0")
+        SCRIPTS_COUNT=$(find scripts -type f 2>/dev/null | wc -l || echo "0")
+        
+        cat > release_notes.md << EOF
+        # 🚀 Specification-Driven Development (SDD) Package ${{ steps.version.outputs.new_version }}
+        
+        Complete SDD framework package for building spec-driven applications with AI assistance.
+        
+        ## 📦 What's Included
+        
+        | Component | Files | Description |
+        |-----------|--------|-------------|
+        | \`.claude/\` | $CLAUDE_COUNT | Claude Code commands for SDD workflow |
+        | \`memory/\` | $MEMORY_COUNT | Constitutional AI memory and development guidelines |
+        | \`scripts/\` | $SCRIPTS_COUNT | Shell scripts for project automation |
+        
+        ## 🏗️ Quick Start
+        
+        \`\`\`bash
+        # Download and extract
+        curl -L https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.new_version }}/sdd-${{ steps.version.outputs.new_version }}.tar.gz | tar -xz
+        
+        # Or clone the specify CLI tool
+        uvx --from git+https://github.com/${{ github.repository }}.git specify clone https://github.com/${{ github.repository }}.git my-project
+        \`\`\`
+        
+        ## 🔧 Prerequisites
+        
+        - Python 3.11+
+        - [Claude Code](https://claude.ai/code) (recommended)
+        - Git
+        - [UV](https://docs.astral.sh/uv/) package manager
+        - [GitHub CLI](https://cli.github.com/) (optional)
+        
+        ## 📝 Changes Since $LAST_TAG
+        
+        $COMMITS
+        
+        ## 🎯 Key Features
+        
+        - **Spec-First Development**: Write specifications before code
+        - **AI-Assisted Planning**: Generate implementation plans with Claude
+        - **Automated Task Generation**: Break down features into actionable tasks
+        - **Constitutional Memory**: Consistent AI behavior across sessions
+        - **Template System**: Reusable project templates
+        
+        ---
+        
+        📚 **[Full Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)** | 
+        🐛 **[Report Issues](https://github.com/${{ github.repository }}/issues)** |
+        💬 **[Discussions](https://github.com/${{ github.repository }}/discussions)**
+        EOF
+        
+    - name: Create GitHub Release
+      uses: gh-cli/gh-action@v2
+      with:
+        gh_args: >
+          release create ${{ steps.version.outputs.new_version }}
+          sdd-${{ steps.version.outputs.new_version }}.tar.gz
+          sdd-${{ steps.version.outputs.new_version }}.zip
+          --title "SDD Framework ${{ steps.version.outputs.new_version }}"
+          --notes-file release_notes.md
+          --prerelease=${{ github.event.inputs.version_bump == 'major' && 'false' || 'true' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
