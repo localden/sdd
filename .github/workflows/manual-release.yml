@@ -168,14 +168,11 @@ jobs:
         EOF
         
     - name: Create GitHub Release
-      uses: gh-cli/gh-action@v2
-      with:
-        gh_args: >
-          release create ${{ steps.version.outputs.new_version }}
-          sdd-${{ steps.version.outputs.new_version }}.tar.gz
-          sdd-${{ steps.version.outputs.new_version }}.zip
-          --title "SDD Framework ${{ steps.version.outputs.new_version }}"
+      run: |
+        gh release create ${{ steps.version.outputs.new_version }} \
+          sdd-${{ steps.version.outputs.new_version }}.tar.gz \
+          sdd-${{ steps.version.outputs.new_version }}.zip \
+          --title "SDD Framework ${{ steps.version.outputs.new_version }}" \
           --notes-file release_notes.md
-          --prerelease=${{ github.event.inputs.version_bump == 'major' && 'false' || 'true' }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
