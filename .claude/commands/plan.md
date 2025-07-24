@@ -1,0 +1,39 @@
+Plan how to implement the specified feature.
+
+This is the second step in the Spec-Driven Development lifecycle.
+
+Given the implementation details "$ARGUMENTS", I need you to:
+
+1. Setup implementation plan structure and get paths:
+   ```bash
+   REPO_ROOT=$(git rev-parse --show-toplevel)
+   PATHS=$($REPO_ROOT/scripts/setup-plan.sh)
+   FEATURE_SPEC=$(echo "$PATHS" | grep "FEATURE_SPEC:" | cut -d' ' -f2)
+   IMPL_PLAN=$(echo "$PATHS" | grep "IMPL_PLAN:" | cut -d' ' -f2)
+   SPECS_DIR=$(echo "$PATHS" | grep "SPECS_DIR:" | cut -d' ' -f2)
+   ```
+2. Read and analyze the feature specification to understand:
+   - The feature requirements and user stories
+   - Functional and non-functional requirements
+   - Success criteria and acceptance criteria
+   - Any technical constraints or dependencies mentioned
+3. Read the constitution at `/memory/constitution.md` to understand constitutional requirements
+4. Execute the implementation plan template:
+   - Load `/templates/implementation-plan-template.md` (already copied to $IMPL_PLAN)
+   - Set Input path to $FEATURE_SPEC
+   - Run the Execution Flow (main) function steps 1-10
+   - The template is self-contained and executable
+   - Follow error handling and gate checks as specified
+   - Let the template guide artifact generation in $SPECS_DIR:
+     * Phase 0 generates research.md
+     * Phase 1 generates data-model.md, contracts/, quickstart.md
+     * Phase 2 generates tasks.md
+   - Incorporate user-provided details from $ARGUMENTS into Technical Context
+   - Update Progress Tracking as you complete each phase
+5. Verify execution completed:
+   - Check Progress Tracking shows all phases complete
+   - Ensure all required artifacts were generated
+   - Confirm no ERROR states in execution
+6. Report results with branch name, file paths, and generated artifacts
+
+Use absolute paths with the repository root for all file operations to avoid path issues.
