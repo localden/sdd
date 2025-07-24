@@ -1,0 +1,170 @@
+name: Create Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Get latest tag
+      id: get_tag
+      run: |
+        # Get the latest tag, or use v0.0.0 if no tags exist
+        LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        
+        # Extract version number and increment
+        VERSION=$(echo $LATEST_TAG | sed 's/v//')
+        IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
+        MAJOR=${VERSION_PARTS[0]:-0}
+        MINOR=${VERSION_PARTS[1]:-0}
+        PATCH=${VERSION_PARTS[2]:-0}
+        
+        # Increment patch version
+        PATCH=$((PATCH + 1))
+        NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
+        
+        echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+        echo "New version will be: $NEW_VERSION"
+        
+    - name: Check if release already exists
+      id: check_release
+      run: |
+        if gh release view ${{ steps.get_tag.outputs.new_version }} >/dev/null 2>&1; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Release ${{ steps.get_tag.outputs.new_version }} already exists, skipping..."
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Release ${{ steps.get_tag.outputs.new_version }} does not exist, proceeding..."
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Create release package
+      if: steps.check_release.outputs.exists == 'false'
+      run: |
+        # Create a temporary directory for the package
+        mkdir -p sdd-package
+        
+        # Copy the required folders
+        if [ -d ".claude" ]; then
+          cp -r .claude sdd-package/
+          echo "Copied .claude folder"
+        fi
+        
+        if [ -d "memory" ]; then
+          cp -r memory sdd-package/
+          echo "Copied memory folder"
+        fi
+        
+        if [ -d "scripts" ]; then
+          cp -r scripts sdd-package/
+          echo "Copied scripts folder"
+        fi
+        
+        # Only copy the three required folders - no root files
+        
+        # Create tarball
+        tar -czf sdd-${{ steps.get_tag.outputs.new_version }}.tar.gz -C sdd-package .
+        
+        # Create zip file
+        cd sdd-package
+        zip -r ../sdd-${{ steps.get_tag.outputs.new_version }}.zip .
+        cd ..
+        
+        # List contents for verification
+        echo "Package contents:"
+        tar -tzf sdd-${{ steps.get_tag.outputs.new_version }}.tar.gz
+        
+    - name: Generate release notes
+      if: steps.check_release.outputs.exists == 'false'
+      id: release_notes
+      run: |
+        # Get commits since last tag
+        LAST_TAG=${{ steps.get_tag.outputs.latest_tag }}
+        if [ "$LAST_TAG" = "v0.0.0" ]; then
+          COMMITS=$(git log --oneline --pretty=format:"- %s" HEAD~10..HEAD)
+        else
+          COMMITS=$(git log --oneline --pretty=format:"- %s" $LAST_TAG..HEAD)
+        fi
+        
+        # Create release notes
+        cat > release_notes.md << EOF
+        # SDD Package ${{ steps.get_tag.outputs.new_version }}
+        
+        This release contains the core Specification-Driven Development (SDD) framework components:
+        
+        ## 📦 Package Contents
+        - \`.claude/\` - Claude Code commands for SDD workflow
+        - \`memory/\` - Constitutional AI memory and guidelines
+        - \`scripts/\` - Shell scripts for project automation
+        
+        ## 🚀 Usage
+        1. Download and extract the package
+        2. Follow the setup instructions in README.md
+        3. Use the provided Claude commands to start your SDD journey
+        
+        ## 📝 Changes in this release
+        $COMMITS
+        
+        ## 🔧 Requirements
+        - Python 3.11+
+        - Claude Code (recommended)
+        - Git
+        - GitHub CLI (optional)
+        EOF
+        
+        echo "Generated release notes:"
+        cat release_notes.md
+        
+    - name: Create GitHub Release
+      if: steps.check_release.outputs.exists == 'false'
+      uses: gh-cli/gh-action@v2
+      with:
+        gh_args: >
+          release create ${{ steps.get_tag.outputs.new_version }}
+          sdd-${{ steps.get_tag.outputs.new_version }}.tar.gz
+          sdd-${{ steps.get_tag.outputs.new_version }}.zip
+          --title "SDD Package ${{ steps.get_tag.outputs.new_version }}"
+          --notes-file release_notes.md
+          --generate-notes
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Update version in pyproject.toml
+      if: steps.check_release.outputs.exists == 'false'
+      run: |
+        # Update version in pyproject.toml (remove 'v' prefix for Python versioning)
+        VERSION=${{ steps.get_tag.outputs.new_version }}
+        PYTHON_VERSION=${VERSION#v}
+        
+        if [ -f "pyproject.toml" ]; then
+          sed -i "s/version = \".*\"/version = \"$PYTHON_VERSION\"/" pyproject.toml
+          echo "Updated pyproject.toml version to $PYTHON_VERSION"
+        fi
+        
+    - name: Commit version update
+      if: steps.check_release.outputs.exists == 'false'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        if git diff --quiet; then
+          echo "No changes to commit"
+        else
+          git add pyproject.toml
+          git commit -m "chore: bump version to ${{ steps.get_tag.outputs.new_version }}"
+          git push
+        fi

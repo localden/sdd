@@ -37,3 +37,4 @@ env/
 *.log
 .env
 .env.local
+*.lock
