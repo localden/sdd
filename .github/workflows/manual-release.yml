@@ -62,58 +62,76 @@ jobs:
         
     - name: Create release package
       run: |
-        # Create a temporary directory for the package
-        mkdir -p sdd-package
+        # Create base package directory structure
+        mkdir -p sdd-package-base
         
-        # Copy the required folders with better error handling
-        echo "Packaging SDD components..."
-        
-        if [ -d ".claude" ]; then
-          cp -r .claude sdd-package/
-          echo "✓ Copied .claude folder ($(find .claude -type f | wc -l) files)"
-        else
-          echo "⚠️ .claude folder not found"
-        fi
+        # Copy common folders to base
+        echo "Packaging SDD common components..."
         
         if [ -d "memory" ]; then
-          cp -r memory sdd-package/
+          cp -r memory sdd-package-base/
           echo "✓ Copied memory folder ($(find memory -type f | wc -l) files)"
         else
           echo "⚠️ memory folder not found"
         fi
         
         if [ -d "scripts" ]; then
-          cp -r scripts sdd-package/
+          cp -r scripts sdd-package-base/
           echo "✓ Copied scripts folder ($(find scripts -type f | wc -l) files)"
         else
           echo "⚠️ scripts folder not found"
         fi
         
+        # Create Claude Code package
+        echo "Creating Claude Code package..."
+        mkdir -p sdd-claude-package
+        cp -r sdd-package-base/* sdd-claude-package/
+        if [ -d ".claude" ]; then
+          cp -r .claude sdd-claude-package/
+          echo "✓ Added Claude Code commands ($(find .claude -type f | wc -l) files)"
+        else
+          echo "⚠️ .claude folder not found"
+        fi
+        
+        # Create Gemini CLI package
+        echo "Creating Gemini CLI package..."
+        mkdir -p sdd-gemini-package
+        cp -r sdd-package-base/* sdd-gemini-package/
         if [ -d ".gemini" ]; then
-          cp -r .gemini sdd-package/
-          echo "✓ Copied .gemini folder ($(find .gemini -type f | wc -l) files)"
+          cp -r .gemini sdd-gemini-package/
+          echo "✓ Added Gemini CLI commands ($(find .gemini -type f | wc -l) files)"
         else
           echo "⚠️ .gemini folder not found"
         fi
         
-        # Copy Copilot instructions to .github folder in package
+        # Create GitHub Copilot package
+        echo "Creating GitHub Copilot package..."
+        mkdir -p sdd-copilot-package
+        cp -r sdd-package-base/* sdd-copilot-package/
         if [ -d ".copilot" ]; then
-          mkdir -p sdd-package/.github
-          cp -r .copilot/* sdd-package/.github/
-          echo "✓ Copied Copilot instructions to .github folder ($(find .copilot -type f | wc -l) files)"
+          mkdir -p sdd-copilot-package/.github
+          cp -r .copilot/* sdd-copilot-package/.github/
+          echo "✓ Added Copilot instructions to .github ($(find .copilot -type f | wc -l) files)"
         else
           echo "⚠️ .copilot folder not found"
         fi
         
-        # Only copy the three required folders - no root files
+        # Create archive files for each package
+        echo "Creating archive files..."
+        tar -czf sdd-template-claude-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-claude-package .
+        cd sdd-claude-package && zip -r ../sdd-template-claude-${{ steps.version.outputs.new_version }}.zip . && cd ..
         
-        # Create both archive formats
-        tar -czf sdd-template-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-package .
-        cd sdd-package && zip -r ../sdd-template-${{ steps.version.outputs.new_version }}.zip . && cd ..
+        tar -czf sdd-template-gemini-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-gemini-package .
+        cd sdd-gemini-package && zip -r ../sdd-template-gemini-${{ steps.version.outputs.new_version }}.zip . && cd ..
+        
+        tar -czf sdd-template-copilot-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-copilot-package .
+        cd sdd-copilot-package && zip -r ../sdd-template-copilot-${{ steps.version.outputs.new_version }}.zip . && cd ..
         
         echo ""
-        echo "📦 Package created with contents:"
-        tar -tzf sdd-template-${{ steps.version.outputs.new_version }}.tar.gz | head -20
+        echo "📦 Packages created:"
+        echo "Claude: $(ls -lh sdd-template-claude-*.zip | awk '{print $5}')"
+        echo "Gemini: $(ls -lh sdd-template-gemini-*.zip | awk '{print $5}')"
+        echo "Copilot: $(ls -lh sdd-template-copilot-*.zip | awk '{print $5}')"
         
     - name: Generate detailed release notes
       run: |
@@ -193,8 +211,12 @@ jobs:
     - name: Create GitHub Release
       run: |
         gh release create ${{ steps.version.outputs.new_version }} \
-          sdd-template-${{ steps.version.outputs.new_version }}.tar.gz \
-          sdd-template-${{ steps.version.outputs.new_version }}.zip \
+          sdd-template-claude-${{ steps.version.outputs.new_version }}.tar.gz \
+          sdd-template-claude-${{ steps.version.outputs.new_version }}.zip \
+          sdd-template-gemini-${{ steps.version.outputs.new_version }}.tar.gz \
+          sdd-template-gemini-${{ steps.version.outputs.new_version }}.zip \
+          sdd-template-copilot-${{ steps.version.outputs.new_version }}.tar.gz \
+          sdd-template-copilot-${{ steps.version.outputs.new_version }}.zip \
           --title "SDD Template ${{ steps.version.outputs.new_version }}" \
           --notes-file release_notes.md
       env:

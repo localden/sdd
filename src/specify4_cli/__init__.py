@@ -130,22 +130,7 @@ def check_tool(tool: str, install_hint: str) -> bool:
         return False
 
 
-def check_claude_code() -> bool:
-    """Check if Claude Code is installed and configured."""
-    claude_installed = check_tool("claude", "Visit https://claude.ai/code to install Claude Code")
-    
-    if claude_installed:
-        # Check if Claude Code has been initialized
-        claude_dir = Path.home() / ".claude"
-        if not claude_dir.exists():
-            console.print("[yellow]⚠️  Claude Code not initialized[/yellow]")
-            console.print("   Run [cyan]claude[/cyan] once to set up")
-            return False
-            
-    return claude_installed
-
-
-def download_and_extract_template(project_name: str) -> Path:
+def download_and_extract_template(project_name: str, ai_assistant: str) -> Path:
     """Download the latest release and extract it to create a new project."""
     project_path = Path(project_name).resolve()
     
@@ -165,11 +150,12 @@ def download_and_extract_template(project_name: str) -> Path:
             # Download latest release template using gh CLI
             task = progress.add_task("Downloading latest template...", total=None)
             try:
-                # Use gh to download the specific template ZIP file
+                # Use gh to download the specific AI assistant template ZIP file
+                pattern = f"sdd-template-{ai_assistant}-*.zip"
                 run_command([
                     "gh", "release", "download", 
                     "--repo", "localden/sdd",
-                    "--pattern", "sdd-template-*.zip",
+                    "--pattern", pattern,
                     "--dir", str(temp_path)
                 ])
             except subprocess.CalledProcessError as e:
@@ -178,10 +164,11 @@ def download_and_extract_template(project_name: str) -> Path:
             progress.update(task, completed=True)
             
             # Find the downloaded template ZIP file
-            template_files = list(temp_path.glob("sdd-template-*.zip"))
+            pattern = f"sdd-template-{ai_assistant}-*.zip"
+            template_files = list(temp_path.glob(pattern))
             if not template_files:
-                console.print("[red]Error:[/red] No template ZIP file found after download")
-                console.print("[yellow]Looking for files matching pattern: sdd-template-*.zip[/yellow]")
+                console.print(f"[red]Error:[/red] No template ZIP file found after download")
+                console.print(f"[yellow]Looking for files matching pattern: {pattern}[/yellow]")
                 console.print(f"[yellow]Files found in {temp_path}:[/yellow]")
                 for file in temp_path.iterdir():
                     console.print(f"  - {file.name}")
@@ -239,39 +226,10 @@ def download_and_extract_template(project_name: str) -> Path:
     return project_path
 
 
-def create_claude_commands_symlink(project_path: Path):
-    """Create symlink for Claude commands if needed."""
-    claude_home = Path.home() / ".claude"
-    project_commands = project_path / ".claude" / "commands"
-    
-    if not project_commands.exists():
-        console.print("[yellow]Warning:[/yellow] No .claude/commands directory found in template")
-        return
-        
-    # Check if user has a global .claude/commands
-    global_commands = claude_home / "commands"
-    
-    if global_commands.exists():
-        console.print("[cyan]Info:[/cyan] You already have global Claude commands")
-        console.print("      To use Specify4 commands in this project, run:")
-        console.print(f"      [cyan]cd {project_path.name} && claude[/cyan]")
-    else:
-        # Offer to create global symlinks
-        console.print("\n[cyan]Would you like to install Specify4 commands globally?[/cyan]")
-        console.print("This will make /specify, /plan, and /tasks available in all projects.")
-        
-        if typer.confirm("Install globally?", default=False):
-            global_commands.mkdir(parents=True, exist_ok=True)
-            for cmd_file in project_commands.glob("*.md"):
-                symlink = global_commands / cmd_file.name
-                if not symlink.exists():
-                    symlink.symlink_to(cmd_file.resolve())
-            console.print("[green]✓[/green] Specify4 commands installed globally")
-
-
 @app.command()
 def init(
     project_name: str = typer.Argument(help="Name for your new project directory"),
+    ai_assistant: str = typer.Option(None, "--ai", help="AI assistant to use: claude, gemini, or copilot"),
     ignore_agent_tools: bool = typer.Option(False, "--ignore-agent-tools", help="Skip checks for AI agent tools like Claude Code"),
 ):
     """
@@ -279,13 +237,17 @@ def init(
     
     This command will:
     1. Check that required tools are installed (git, gh)
-    2. Download the latest release from GitHub
-    3. Extract the template to a new project directory
-    4. Initialize a fresh git repository
-    5. Optionally set up Claude commands
+    2. Let you choose your AI assistant (Claude Code, Gemini CLI, or GitHub Copilot)
+    3. Download the appropriate template from GitHub
+    4. Extract the template to a new project directory
+    5. Initialize a fresh git repository
+    6. Optionally set up AI assistant commands
     
     Examples:
         specify init my-project
+        specify init my-project --ai claude
+        specify init my-project --ai gemini
+        specify init my-project --ai copilot
         specify init --ignore-agent-tools my-project
     """
     # Show banner first
@@ -296,6 +258,11 @@ def init(
         f"Creating new project: [green]{project_name}[/green]",
         border_style="cyan"
     ))
+    
+    # Check if project directory already exists
+    if os.path.exists(project_name):
+        console.print(f"[red]Error:[/red] Directory '{project_name}' already exists")
+        raise typer.Exit(1)
     
     # Check required tools
     console.print("\n[bold]Checking required tools...[/bold]")
@@ -310,26 +277,63 @@ def init(
         console.print("[red]Cannot proceed without git and gh.[/red]")
         raise typer.Exit(1)
     
-    # Check optional agent tools
+    # AI assistant selection
+    ai_choices = {
+        "claude": "Claude Code (VSCode extension with / commands)",
+        "gemini": "Gemini CLI (terminal-based AI assistant)",
+        "copilot": "GitHub Copilot (VSCode extension)"
+    }
+    
+    if ai_assistant:
+        if ai_assistant not in ai_choices:
+            console.print(f"[red]Error:[/red] Invalid AI assistant '{ai_assistant}'. Choose from: {', '.join(ai_choices.keys())}")
+            raise typer.Exit(1)
+        selected_ai = ai_assistant
+    else:
+        console.print("\n[bold cyan]Choose your AI assistant:[/bold cyan]")
+        for key, description in ai_choices.items():
+            console.print(f"  [cyan]{key}[/cyan]: {description}")
+        
+        while True:
+            selected_ai = typer.prompt("\nSelect AI assistant", type=str).lower().strip()
+            if selected_ai in ai_choices:
+                break
+            console.print(f"[red]Invalid choice.[/red] Please enter one of: {', '.join(ai_choices.keys())}")
+    
+    console.print(f"[green]Selected AI assistant:[/green] {ai_choices[selected_ai]}")
+    
+    # Check agent tools unless ignored
     if not ignore_agent_tools:
-        agent_tools_ok = check_claude_code()
-        if not agent_tools_ok:
-            console.print("\n[yellow]Optional AI agent tools are missing.[/yellow]")
-            if not typer.confirm("Continue without AI agent tools?", default=True):
-                raise typer.Exit(1)
+        if selected_ai == "claude":
+            console.print("[yellow]Note:[/yellow] Make sure Claude Code extension is installed in VSCode")
+        elif selected_ai == "gemini":
+            if not check_tool("gemini", "Install from: https://github.com/google/generative-ai-cli"):
+                console.print("[yellow]Warning:[/yellow] Gemini CLI not found but will continue")
+        # GitHub Copilot check is not needed as it's typically available in supported IDEs
     
     # Download and set up project
     console.print(f"\n[bold]Setting up project from latest template...[/bold]")
     
     try:
-        project_path = download_and_extract_template(project_name)
+        project_path = download_and_extract_template(project_name, selected_ai)
+        
+        # Initialize git repository
+        os.chdir(project_name)
+        
+        console.print("[cyan]Initializing git repository...[/cyan]")
+        subprocess.run(["git", "init"], check=True, capture_output=True)
+        subprocess.run(["git", "add", "."], check=True, capture_output=True)
+        subprocess.run(["git", "commit", "-m", "Initial commit from Specify4 template"], check=True, capture_output=True)
+        
+        console.print(f"[green]✓[/green] Git repository initialized")
+        
     except Exception as e:
         console.print(f"[red]Failed to set up project:[/red] {e}")
+        # Clean up partial directory if it was created
+        if os.path.exists(project_name):
+            import shutil
+            shutil.rmtree(project_name)
         raise typer.Exit(1)
-    
-    # Offer to set up Claude commands
-    if not ignore_agent_tools:
-        create_claude_commands_symlink(project_path)
     
     # Success!
     console.print("\n" + "─" * 60)
@@ -339,12 +343,26 @@ def init(
     
     console.print(f"\n[bold]Next steps:[/bold]")
     console.print(f"1. [cyan]cd {project_name}[/cyan]")
-    console.print(f"2. [cyan]claude[/cyan]  # Start Claude Code")
-    console.print(f"3. [cyan]/specify[/cyan] your first feature")
-    console.print(f"4. [cyan]/plan[/cyan] the implementation")
-    console.print(f"5. [cyan]/tasks[/cyan] to generate tasks")
     
-    console.print(f"\n[dim]Your first /plan will replace CLAUDE.md with project-specific context.[/dim]")
+    if selected_ai == "claude":
+        console.print("2. Open in VSCode and start using / commands with Claude Code")
+        console.print("   - Type / in any file to see available commands")
+        console.print("   - Use [cyan]/spec[/cyan] to create specifications")
+        console.print("   - Use [cyan]/plan[/cyan] to create implementation plans")
+        console.print("   - Use [cyan]/tasks[/cyan] to generate tasks")
+    elif selected_ai == "gemini":
+        console.print("2. Use @ commands with Gemini CLI")
+        console.print("   - Run [cyan]gemini @spec[/cyan] to create specifications")
+        console.print("   - Run [cyan]gemini @plan[/cyan] to create implementation plans")
+        console.print("   - See .gemini/GEMINI.md for all available commands")
+    elif selected_ai == "copilot":
+        console.print("2. Open in VSCode and use natural language with GitHub Copilot")
+        console.print("   - See .github/copilot-instructions.md for available commands")
+        console.print("   - Use Copilot Chat for interactive assistance")
+    
+    console.print("3. Read README.md for project overview")
+    console.print("4. Check the documentation in the docs/ folder")
+    
     console.print(f"\n[italic bright_yellow]Happy coding with Specify4! 🚀[/italic bright_yellow]\n")
 
 
@@ -356,14 +374,20 @@ def check():
     
     all_ok = True
     all_ok &= check_tool("git", "https://git-scm.com/downloads")
-    all_ok &= check_claude_code()
     all_ok &= check_tool("gh", "https://cli.github.com/")
     all_ok &= check_tool("uv", "curl -LsSf https://astral.sh/uv/install.sh | sh")
     
+    console.print("\n[cyan]Optional AI tools:[/cyan]")
+    claude_ok = check_tool("claude", "Claude Code extension for VSCode")
+    gemini_ok = check_tool("gemini", "https://github.com/google/generative-ai-cli")
+    console.print("   GitHub Copilot: Available in VSCode and supported IDEs")
+    
     if all_ok:
-        console.print("\n[green]✓ All tools installed![/green]")
+        console.print("\n[green]✓ All required tools installed![/green]")
+        if not (claude_ok or gemini_ok):
+            console.print("[yellow]Consider installing an AI assistant for the best experience[/yellow]")
     else:
-        console.print("\n[red]✗ Some tools are missing[/red]")
+        console.print("\n[red]✗ Some required tools are missing[/red]")
         raise typer.Exit(1)
 
 
