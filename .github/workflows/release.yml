@@ -77,16 +77,16 @@ jobs:
         # Only copy the three required folders - no root files
         
         # Create tarball
-        tar -czf sdd-${{ steps.get_tag.outputs.new_version }}.tar.gz -C sdd-package .
+        tar -czf sdd-template-${{ steps.get_tag.outputs.new_version }}.tar.gz -C sdd-package .
         
         # Create zip file
         cd sdd-package
-        zip -r ../sdd-${{ steps.get_tag.outputs.new_version }}.zip .
+        zip -r ../sdd-template-${{ steps.get_tag.outputs.new_version }}.zip .
         cd ..
         
         # List contents for verification
         echo "Package contents:"
-        tar -tzf sdd-${{ steps.get_tag.outputs.new_version }}.tar.gz
+        tar -tzf sdd-template-${{ steps.get_tag.outputs.new_version }}.tar.gz
         
     - name: Generate release notes
       if: steps.check_release.outputs.exists == 'false'
@@ -102,9 +102,9 @@ jobs:
         
         # Create release notes
         cat > release_notes.md << EOF
-        # SDD Package ${{ steps.get_tag.outputs.new_version }}
+        # SDD Template ${{ steps.get_tag.outputs.new_version }}
         
-        This release contains the core Specification-Driven Development (SDD) framework components:
+        This release contains the core Specification-Driven Development (SDD) framework template:
         
         ## 📦 Package Contents
         - \`.claude/\` - Claude Code commands for SDD workflow
@@ -112,7 +112,7 @@ jobs:
         - \`scripts/\` - Shell scripts for project automation
         
         ## 🚀 Usage
-        1. Download and extract the package
+        1. Download and extract the template
         2. Follow the setup instructions in README.md
         3. Use the provided Claude commands to start your SDD journey
         
@@ -133,9 +133,9 @@ jobs:
       if: steps.check_release.outputs.exists == 'false'
       run: |
         gh release create ${{ steps.get_tag.outputs.new_version }} \
-          sdd-${{ steps.get_tag.outputs.new_version }}.tar.gz \
-          sdd-${{ steps.get_tag.outputs.new_version }}.zip \
-          --title "SDD Package ${{ steps.get_tag.outputs.new_version }}" \
+          sdd-template-${{ steps.get_tag.outputs.new_version }}.tar.gz \
+          sdd-template-${{ steps.get_tag.outputs.new_version }}.zip \
+          --title "SDD Template ${{ steps.get_tag.outputs.new_version }}" \
           --notes-file release_notes.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

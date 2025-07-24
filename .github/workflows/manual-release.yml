@@ -92,12 +92,12 @@ jobs:
         # Only copy the three required folders - no root files
         
         # Create both archive formats
-        tar -czf sdd-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-package .
-        cd sdd-package && zip -r ../sdd-${{ steps.version.outputs.new_version }}.zip . && cd ..
+        tar -czf sdd-template-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-package .
+        cd sdd-package && zip -r ../sdd-template-${{ steps.version.outputs.new_version }}.zip . && cd ..
         
         echo ""
         echo "📦 Package created with contents:"
-        tar -tzf sdd-${{ steps.version.outputs.new_version }}.tar.gz | head -20
+        tar -tzf sdd-template-${{ steps.version.outputs.new_version }}.tar.gz | head -20
         
     - name: Generate detailed release notes
       run: |
@@ -118,9 +118,9 @@ jobs:
         SCRIPTS_COUNT=$(find scripts -type f 2>/dev/null | wc -l || echo "0")
         
         cat > release_notes.md << EOF
-        # 🚀 Specification-Driven Development (SDD) Package ${{ steps.version.outputs.new_version }}
+        # 🚀 Specification-Driven Development (SDD) Template ${{ steps.version.outputs.new_version }}
         
-        Complete SDD framework package for building spec-driven applications with AI assistance.
+        Complete SDD framework template for building spec-driven applications with AI assistance.
         
         ## 📦 What's Included
         
@@ -134,10 +134,10 @@ jobs:
         
         \`\`\`bash
         # Download and extract
-        curl -L https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.new_version }}/sdd-${{ steps.version.outputs.new_version }}.tar.gz | tar -xz
+        curl -L https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.new_version }}/sdd-template-${{ steps.version.outputs.new_version }}.tar.gz | tar -xz
         
-        # Or clone the specify CLI tool
-        uvx --from git+https://github.com/${{ github.repository }}.git specify clone https://github.com/${{ github.repository }}.git my-project
+        # Or use the specify CLI tool
+        uvx --from git+https://github.com/${{ github.repository }}.git specify init my-project
         \`\`\`
         
         ## 🔧 Prerequisites
@@ -170,9 +170,9 @@ jobs:
     - name: Create GitHub Release
       run: |
         gh release create ${{ steps.version.outputs.new_version }} \
-          sdd-${{ steps.version.outputs.new_version }}.tar.gz \
-          sdd-${{ steps.version.outputs.new_version }}.zip \
-          --title "SDD Framework ${{ steps.version.outputs.new_version }}" \
+          sdd-template-${{ steps.version.outputs.new_version }}.tar.gz \
+          sdd-template-${{ steps.version.outputs.new_version }}.zip \
+          --title "SDD Template ${{ steps.version.outputs.new_version }}" \
           --notes-file release_notes.md
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
