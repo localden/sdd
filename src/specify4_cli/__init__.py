@@ -182,25 +182,43 @@ def download_and_extract_template(project_name: str) -> Path:
             if not template_files:
                 console.print("[red]Error:[/red] No template ZIP file found after download")
                 console.print("[yellow]Looking for files matching pattern: sdd-template-*.zip[/yellow]")
+                console.print(f"[yellow]Files found in {temp_path}:[/yellow]")
+                for file in temp_path.iterdir():
+                    console.print(f"  - {file.name}")
                 raise typer.Exit(1)
             
             zip_path = template_files[0]
+            console.print(f"[cyan]Downloaded:[/cyan] {zip_path.name}")
+            console.print(f"[cyan]Size:[/cyan] {zip_path.stat().st_size:,} bytes")
             
             # Extract ZIP file
             task = progress.add_task("Extracting template...", total=None)
             try:
                 with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    # List all files in the ZIP for debugging
+                    zip_contents = zip_ref.namelist()
+                    console.print(f"[cyan]ZIP contains {len(zip_contents)} items[/cyan]")
+                    
                     # Extract to temporary directory first
                     extract_dir = temp_path / "extracted"
                     zip_ref.extractall(extract_dir)
                     
-                    # Find the extracted folder (GitHub ZIP creates a folder like "localden-sdd-{commit}")
+                    # Check what was extracted
                     extracted_items = list(extract_dir.iterdir())
-                    if len(extracted_items) != 1 or not extracted_items[0].is_dir():
-                        console.print("[red]Error:[/red] Unexpected ZIP structure")
-                        raise typer.Exit(1)
+                    console.print(f"[cyan]Extracted {len(extracted_items)} items:[/cyan]")
+                    for item in extracted_items:
+                        console.print(f"  - {item.name} ({'dir' if item.is_dir() else 'file'})")
                     
-                    extracted_source = extracted_items[0]
+                    # Handle different ZIP structures
+                    if len(extracted_items) == 1 and extracted_items[0].is_dir():
+                        # GitHub-style ZIP with a single root directory
+                        extracted_source = extracted_items[0]
+                    elif len(extracted_items) > 0:
+                        # Our release ZIP with direct contents
+                        extracted_source = extract_dir
+                    else:
+                        console.print("[red]Error:[/red] ZIP file appears to be empty")
+                        raise typer.Exit(1)
                     
                     # Move contents to project directory
                     project_path.mkdir(parents=True)
