@@ -420,12 +420,21 @@ def init(
     
     # Check agent tools unless ignored
     if not ignore_agent_tools:
+        agent_tool_missing = False
         if selected_ai == "claude":
-            console.print("[yellow]Note:[/yellow] Make sure Claude Code extension is installed in VSCode")
+            if not check_tool("claude", "Install from: https://docs.anthropic.com/en/docs/claude-code/setup"):
+                console.print("[red]Error:[/red] Claude CLI is required for Claude Code projects")
+                agent_tool_missing = True
         elif selected_ai == "gemini":
-            if not check_tool("gemini", "Install from: https://github.com/google/generative-ai-cli"):
-                console.print("[yellow]Warning:[/yellow] Gemini CLI not found but will continue")
+            if not check_tool("gemini", "Install from: https://github.com/google-gemini/gemini-cli"):
+                console.print("[red]Error:[/red] Gemini CLI is required for Gemini projects")
+                agent_tool_missing = True
         # GitHub Copilot check is not needed as it's typically available in supported IDEs
+        
+        if agent_tool_missing:
+            console.print("\n[red]Required AI tool is missing![/red]")
+            console.print(f"[yellow]Tip:[/yellow] Use --ignore-agent-tools to skip this check")
+            raise typer.Exit(1)
     
     # Download and set up project
     console.print(f"\n[bold]Setting up project from latest template...[/bold]")
@@ -492,9 +501,9 @@ def check():
     all_ok &= check_tool("uv", "curl -LsSf https://astral.sh/uv/install.sh | sh")
     
     console.print("\n[cyan]Optional AI tools:[/cyan]")
-    claude_ok = check_tool("claude", "https://docs.anthropic.com/en/docs/claude-code/setup")
-    gemini_ok = check_tool("gemini", "https://github.com/google-gemini/gemini-cli")
-    console.print("   GitHub Copilot: Available in VSCode and supported IDEs")
+    claude_ok = check_tool("claude", "Install from: https://docs.anthropic.com/en/docs/claude-code/setup")
+    gemini_ok = check_tool("gemini", "Install from: https://github.com/google-gemini/gemini-cli")
+    console.print("   GitHub Copilot: Available in VS Code and supported IDEs")
     
     if all_ok:
         console.print("\n[green]✓ All required tools installed![/green]")
