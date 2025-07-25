@@ -82,6 +82,11 @@ jobs:
         cp -r sdd-package-base/* sdd-gemini-package/
         if [ -d ".gemini" ]; then
           cp -r .gemini sdd-gemini-package/
+          # Move GEMINI.md to root for easier access
+          if [ -f "sdd-gemini-package/.gemini/GEMINI.md" ]; then
+            mv sdd-gemini-package/.gemini/GEMINI.md sdd-gemini-package/GEMINI.md
+            echo "Moved GEMINI.md to root of Gemini package"
+          fi
           echo "Created Gemini CLI package"
         fi
         
