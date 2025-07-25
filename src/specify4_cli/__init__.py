@@ -33,7 +33,16 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 from rich.align import Align
+from rich.prompt import Prompt
+from rich.live import Live
+from rich.table import Table
 from typer.core import TyperGroup
+
+# For cross-platform keyboard input
+try:
+    import msvcrt  # Windows
+except ImportError:
+    import termios, tty  # Unix/Linux/Mac
 
 # ASCII Art Banner
 BANNER = """
@@ -52,6 +61,117 @@ MINI_BANNER = """
 ╚═╗╠═╝║╣ ║  ║╠╣ ╚╦╝
 ╚═╝╩  ╚═╝╚═╝╩╚   ╩ 
 """
+
+def get_key():
+    """Get a single keypress in a cross-platform way."""
+    if sys.platform == "win32":
+        # Windows
+        key = msvcrt.getch()
+        if key == b'\xe0':  # Special key prefix on Windows
+            key = msvcrt.getch()
+            if key == b'H':  # Up arrow
+                return 'up'
+            elif key == b'P':  # Down arrow
+                return 'down'
+        elif key == b'\r':  # Enter
+            return 'enter'
+        elif key == b'\x1b':  # Escape
+            return 'escape'
+        return key.decode('utf-8', errors='ignore')
+    else:
+        # Unix/Linux/Mac
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            key = sys.stdin.read(1)
+            if key == '\x1b':  # Escape sequence
+                key += sys.stdin.read(2)
+                if key == '\x1b[A':  # Up arrow
+                    return 'up'
+                elif key == '\x1b[B':  # Down arrow
+                    return 'down'
+            elif key == '\r' or key == '\n':  # Enter
+                return 'enter'
+            elif key == '\x1b':  # Escape
+                return 'escape'
+            return key
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+
+def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: str = None) -> str:
+    """
+    Interactive selection using arrow keys with Rich Live display.
+    
+    Args:
+        options: Dict with keys as option keys and values as descriptions
+        prompt_text: Text to show above the options
+        default_key: Default option key to start with
+        
+    Returns:
+        Selected option key
+    """
+    option_keys = list(options.keys())
+    if default_key and default_key in option_keys:
+        selected_index = option_keys.index(default_key)
+    else:
+        selected_index = 0
+    
+    def create_selection_display():
+        """Create the selection display."""
+        # Create the options table
+        table = Table.grid(padding=(0, 2))
+        table.add_column(style="bright_cyan", justify="left", width=3)
+        table.add_column(style="white", justify="left")
+        
+        for i, key in enumerate(option_keys):
+            if i == selected_index:
+                # Highlighted option with arrow
+                table.add_row("▶", f"[bright_cyan]{key}: {options[key]}[/bright_cyan]")
+            else:
+                # Normal option
+                table.add_row(" ", f"[white]{key}: {options[key]}[/white]")
+        
+        # Add instructions at the bottom
+        table.add_row("", "")
+        table.add_row("", "[dim]Use ↑/↓ arrow keys to navigate, Enter to select, Esc to cancel[/dim]")
+        
+        # Create the main panel
+        panel = Panel(
+            table,
+            title=f"[bold]{prompt_text}[/bold]",
+            border_style="cyan",
+            padding=(1, 2)
+        )
+        
+        return panel
+    
+    # Start the Live display
+    with Live(create_selection_display(), console=console, refresh_per_second=10) as live:
+        while True:
+            key = get_key()
+            
+            if key == 'up':
+                selected_index = (selected_index - 1) % len(option_keys)
+                live.update(create_selection_display())
+                
+            elif key == 'down':
+                selected_index = (selected_index + 1) % len(option_keys)
+                live.update(create_selection_display())
+                
+            elif key == 'enter':
+                selected_key = option_keys[selected_index]
+                break
+                
+            elif key == 'escape':
+                console.print("[yellow]Selection cancelled[/yellow]")
+                raise typer.Exit(1)
+    
+    # Show final selection
+    console.print(f"\n[green]✓ Selected:[/green] {selected_key}: {options[selected_key]}")
+    return selected_key
+
 
 console = Console()
 
@@ -279,9 +399,9 @@ def init(
     
     # AI assistant selection
     ai_choices = {
-        "claude": "Claude Code (VSCode extension with / commands)",
-        "gemini": "Gemini CLI (terminal-based AI assistant)",
-        "copilot": "GitHub Copilot (VSCode extension)"
+        "claude": "Claude Code",
+        "gemini": "Gemini CLI",
+        "copilot": "GitHub Copilot"
     }
     
     if ai_assistant:
@@ -290,17 +410,14 @@ def init(
             raise typer.Exit(1)
         selected_ai = ai_assistant
     else:
-        console.print("\n[bold cyan]Choose your AI assistant:[/bold cyan]")
-        for key, description in ai_choices.items():
-            console.print(f"  [cyan]{key}[/cyan]: {description}")
-        
-        while True:
-            selected_ai = typer.prompt("\nSelect AI assistant", type=str).lower().strip()
-            if selected_ai in ai_choices:
-                break
-            console.print(f"[red]Invalid choice.[/red] Please enter one of: {', '.join(ai_choices.keys())}")
+        # Use arrow-key selection interface
+        selected_ai = select_with_arrows(
+            ai_choices, 
+            "Choose your AI assistant:", 
+            "claude"
+        )
     
-    console.print(f"[green]Selected AI assistant:[/green] {ai_choices[selected_ai]}")
+    console.print(f"[green]✓ Selected AI assistant:[/green] {ai_choices[selected_ai]}")
     
     # Check agent tools unless ignored
     if not ignore_agent_tools:
@@ -354,7 +471,7 @@ def init(
         console.print("2. Use @ commands with Gemini CLI")
         console.print("   - Run [cyan]gemini @spec[/cyan] to create specifications")
         console.print("   - Run [cyan]gemini @plan[/cyan] to create implementation plans")
-        console.print("   - See .gemini/GEMINI.md for all available commands")
+        console.print("   - See [cyan]GEMINI.md[/cyan] for all available commands")
     elif selected_ai == "copilot":
         console.print("2. Open in VSCode and use natural language with GitHub Copilot")
         console.print("   - See .github/copilot-instructions.md for available commands")
