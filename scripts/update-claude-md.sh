@@ -38,7 +38,7 @@ if [ ! -f "$CLAUDE_MD" ]; then
     echo "Creating new CLAUDE.md for your project..."
     
     # Check if this is the Specify4 repo itself
-    if [ -f "$REPO_ROOT/.claude/commands/specify.md" ] && [ -f "$REPO_ROOT/templates/CLAUDE-template.md" ]; then
+    if [ -f "$REPO_ROOT/agent_templates/claude/commands/specify.md" ] && [ -f "$REPO_ROOT/templates/CLAUDE-template.md" ]; then
         echo "Note: Replacing Specify4's CLAUDE.md with project-specific version"
     fi
     

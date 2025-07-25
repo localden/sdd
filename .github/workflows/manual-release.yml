@@ -86,19 +86,19 @@ jobs:
         echo "Creating Claude Code package..."
         mkdir -p sdd-claude-package
         cp -r sdd-package-base/* sdd-claude-package/
-        if [ -d ".claude" ]; then
-          cp -r .claude sdd-claude-package/
-          echo "✓ Added Claude Code commands ($(find .claude -type f | wc -l) files)"
+        if [ -d "agent_templates/claude" ]; then
+          cp -r agent_templates/claude sdd-claude-package/.claude
+          echo "✓ Added Claude Code commands ($(find agent_templates/claude -type f | wc -l) files)"
         else
-          echo "⚠️ .claude folder not found"
+          echo "⚠️ agent_templates/claude folder not found"
         fi
         
         # Create Gemini CLI package
         echo "Creating Gemini CLI package..."
         mkdir -p sdd-gemini-package
         cp -r sdd-package-base/* sdd-gemini-package/
-        if [ -d ".gemini" ]; then
-          cp -r .gemini sdd-gemini-package/
+        if [ -d "agent_templates/gemini" ]; then
+          cp -r agent_templates/gemini sdd-gemini-package/.gemini
           # Move GEMINI.md to root for easier access
           if [ -f "sdd-gemini-package/.gemini/GEMINI.md" ]; then
             mv sdd-gemini-package/.gemini/GEMINI.md sdd-gemini-package/GEMINI.md
@@ -109,32 +109,29 @@ jobs:
             rm -rf sdd-gemini-package/.gemini
             echo "✓ Removed empty .gemini folder"
           fi
-          echo "✓ Added Gemini CLI commands ($(find .gemini -type f | wc -l) files)"
+          echo "✓ Added Gemini CLI commands ($(find agent_templates/gemini -type f | wc -l) files)"
         else
-          echo "⚠️ .gemini folder not found"
+          echo "⚠️ agent_templates/gemini folder not found"
         fi
         
         # Create GitHub Copilot package
         echo "Creating GitHub Copilot package..."
         mkdir -p sdd-copilot-package
         cp -r sdd-package-base/* sdd-copilot-package/
-        if [ -d ".copilot" ]; then
+        if [ -d "agent_templates/copilot" ]; then
           mkdir -p sdd-copilot-package/.github
-          cp -r .copilot/* sdd-copilot-package/.github/
-          echo "✓ Added Copilot instructions to .github ($(find .copilot -type f | wc -l) files)"
+          cp -r agent_templates/copilot/* sdd-copilot-package/.github/
+          echo "✓ Added Copilot instructions to .github ($(find agent_templates/copilot -type f | wc -l) files)"
         else
-          echo "⚠️ .copilot folder not found"
+          echo "⚠️ agent_templates/copilot folder not found"
         fi
         
         # Create archive files for each package
         echo "Creating archive files..."
-        tar -czf sdd-template-claude-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-claude-package .
         cd sdd-claude-package && zip -r ../sdd-template-claude-${{ steps.version.outputs.new_version }}.zip . && cd ..
         
-        tar -czf sdd-template-gemini-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-gemini-package .
         cd sdd-gemini-package && zip -r ../sdd-template-gemini-${{ steps.version.outputs.new_version }}.zip . && cd ..
         
-        tar -czf sdd-template-copilot-${{ steps.version.outputs.new_version }}.tar.gz -C sdd-copilot-package .
         cd sdd-copilot-package && zip -r ../sdd-template-copilot-${{ steps.version.outputs.new_version }}.zip . && cd ..
         
         echo ""
@@ -157,75 +154,31 @@ jobs:
         fi
         
         # Count files in each directory
-        CLAUDE_COUNT=$(find .claude -type f 2>/dev/null | wc -l || echo "0")
-        GEMINI_COUNT=$(find .gemini -type f 2>/dev/null | wc -l || echo "0")
-        COPILOT_COUNT=$(find .copilot -type f 2>/dev/null | wc -l || echo "0")
+        CLAUDE_COUNT=$(find agent_templates/claude -type f 2>/dev/null | wc -l || echo "0")
+        GEMINI_COUNT=$(find agent_templates/gemini -type f 2>/dev/null | wc -l || echo "0")
+        COPILOT_COUNT=$(find agent_templates/copilot -type f 2>/dev/null | wc -l || echo "0")
         MEMORY_COUNT=$(find memory -type f 2>/dev/null | wc -l || echo "0")
         SCRIPTS_COUNT=$(find scripts -type f 2>/dev/null | wc -l || echo "0")
         
         cat > release_notes.md << EOF
-        # 🚀 Specification-Driven Development (SDD) Template ${{ steps.version.outputs.new_version }}
+        Template release ${{ steps.version.outputs.new_version }}
         
-        Complete SDD framework template for building spec-driven applications with AI assistance.
+        Updated SDD templates for Claude Code, Gemini CLI, and GitHub Copilot.
         
-        ## 📦 What's Included
+        Download the template for your preferred AI assistant:
+        - sdd-template-claude-${{ steps.version.outputs.new_version }}.zip
+        - sdd-template-gemini-${{ steps.version.outputs.new_version }}.zip  
+        - sdd-template-copilot-${{ steps.version.outputs.new_version }}.zip
         
-        | Component | Files | Description |
-        |-----------|--------|-------------|
-        | \`.claude/\` | $CLAUDE_COUNT | Claude Code commands for SDD workflow |
-        | \`.gemini/\` | $GEMINI_COUNT | Gemini CLI commands for SDD workflow |
-        | \`.github/\` | $COPILOT_COUNT | GitHub Copilot instructions for SDD workflow |
-        | \`memory/\` | $MEMORY_COUNT | Constitutional AI memory and development guidelines |
-        | \`scripts/\` | $SCRIPTS_COUNT | Shell scripts for project automation |
-        
-        ## 🏗️ Quick Start
-        
-        \`\`\`bash
-        # Download and extract
-        curl -L https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.new_version }}/sdd-template-${{ steps.version.outputs.new_version }}.tar.gz | tar -xz
-        
-        # Or use the specify CLI tool
-        uvx --from git+https://github.com/${{ github.repository }}.git specify init my-project
-        \`\`\`
-        
-        ## 🔧 Prerequisites
-        
-        - Python 3.11+
-        - AI coding assistant:
-          * [Claude Code](https://claude.ai/code) - Use \`.claude/\` commands
-          * [Gemini CLI](https://ai.google.dev/gemini-api/docs/cli) - Use \`.gemini/\` commands
-          * [GitHub Copilot](https://github.com/features/copilot) - Use \`.github/\` instructions
-        - Git
-        - [UV](https://docs.astral.sh/uv/) package manager
-        - [GitHub CLI](https://cli.github.com/) (optional)
-        
-        ## 📝 Changes Since $LAST_TAG
-        
+        Changes since $LAST_TAG:
         $COMMITS
-        
-        ## 🎯 Key Features
-        
-        - **Spec-First Development**: Write specifications before code
-        - **AI-Assisted Planning**: Generate implementation plans with Claude
-        - **Automated Task Generation**: Break down features into actionable tasks
-        - **Constitutional Memory**: Consistent AI behavior across sessions
-        - **Template System**: Reusable project templates
-        
-        ---
-        
-        📚 **[Full Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)** | 
-        🐛 **[Report Issues](https://github.com/${{ github.repository }}/issues)** |
-        💬 **[Discussions](https://github.com/${{ github.repository }}/discussions)**
         EOF
         
     - name: Create GitHub Release
       run: |
         gh release create ${{ steps.version.outputs.new_version }} \
-          sdd-template-claude-${{ steps.version.outputs.new_version }}.tar.gz \
           sdd-template-claude-${{ steps.version.outputs.new_version }}.zip \
-          sdd-template-gemini-${{ steps.version.outputs.new_version }}.tar.gz \
           sdd-template-gemini-${{ steps.version.outputs.new_version }}.zip \
-          sdd-template-copilot-${{ steps.version.outputs.new_version }}.tar.gz \
           sdd-template-copilot-${{ steps.version.outputs.new_version }}.zip \
           --title "SDD Template ${{ steps.version.outputs.new_version }}" \
           --notes-file release_notes.md

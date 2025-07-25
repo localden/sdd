@@ -72,16 +72,16 @@ jobs:
         # Create Claude Code package
         mkdir -p sdd-claude-package
         cp -r sdd-package-base/* sdd-claude-package/
-        if [ -d ".claude" ]; then
-          cp -r .claude sdd-claude-package/
+        if [ -d "agent_templates/claude" ]; then
+          cp -r agent_templates/claude sdd-claude-package/.claude
           echo "Created Claude Code package"
         fi
         
         # Create Gemini CLI package
         mkdir -p sdd-gemini-package
         cp -r sdd-package-base/* sdd-gemini-package/
-        if [ -d ".gemini" ]; then
-          cp -r .gemini sdd-gemini-package/
+        if [ -d "agent_templates/gemini" ]; then
+          cp -r agent_templates/gemini sdd-gemini-package/.gemini
           # Move GEMINI.md to root for easier access
           if [ -f "sdd-gemini-package/.gemini/GEMINI.md" ]; then
             mv sdd-gemini-package/.gemini/GEMINI.md sdd-gemini-package/GEMINI.md
@@ -98,29 +98,26 @@ jobs:
         # Create GitHub Copilot package
         mkdir -p sdd-copilot-package
         cp -r sdd-package-base/* sdd-copilot-package/
-        if [ -d ".copilot" ]; then
+        if [ -d "agent_templates/copilot" ]; then
           mkdir -p sdd-copilot-package/.github
-          cp -r .copilot/* sdd-copilot-package/.github/
+          cp -r agent_templates/copilot/* sdd-copilot-package/.github/
           echo "Created GitHub Copilot package"
         fi
         
         # Create archive files for each package
-        tar -czf sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.tar.gz -C sdd-claude-package .
         cd sdd-claude-package && zip -r ../sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.zip . && cd ..
         
-        tar -czf sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.tar.gz -C sdd-gemini-package .
         cd sdd-gemini-package && zip -r ../sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.zip . && cd ..
         
-        tar -czf sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.tar.gz -C sdd-copilot-package .
         cd sdd-copilot-package && zip -r ../sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.zip . && cd ..
         
         # List contents for verification
         echo "Claude package contents:"
-        tar -tzf sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.tar.gz | head -10
+        unzip -l sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.zip | head -10
         echo "Gemini package contents:"
-        tar -tzf sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.tar.gz | head -10
+        unzip -l sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.zip | head -10
         echo "Copilot package contents:"
-        tar -tzf sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.tar.gz | head -10
+        unzip -l sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.zip | head -10
         
     - name: Generate release notes
       if: steps.check_release.outputs.exists == 'false'
@@ -136,44 +133,14 @@ jobs:
         
         # Create release notes
         cat > release_notes.md << EOF
-        # SDD Template ${{ steps.get_tag.outputs.new_version }}
+        Template release ${{ steps.get_tag.outputs.new_version }}
         
-        This release contains the core Specification-Driven Development (SDD) framework templates for different AI assistants:
+        Updated SDD templates for Claude Code, Gemini CLI, and GitHub Copilot.
         
-        ## 📦 Package Variants
-        
-        Choose the package that matches your preferred AI coding assistant:
-        
-        ### Claude Code Package
-        - **File**: \`sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.zip\`
-        - **Contains**: \`.claude/\` commands, \`memory/\`, \`scripts/\`
-        - **Usage**: Use \`/specify\`, \`/plan\`, \`/tasks\` commands in Claude Code
-        
-        ### Gemini CLI Package  
-        - **File**: \`sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.zip\`
-        - **Contains**: \`.gemini/\` commands, \`memory/\`, \`scripts/\`
-        - **Usage**: Use \`@specify\`, \`@plan\`, \`@tasks\` commands in Gemini CLI
-        
-        ### GitHub Copilot Package
-        - **File**: \`sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.zip\`
-        - **Contains**: \`.github/\` instructions, \`memory/\`, \`scripts/\`
-        - **Usage**: Reference SDD workflows in Copilot Chat/CLI prompts
-        
-        ## 🚀 Quick Start
-        
-        1. Download the package for your AI assistant
-        2. Extract to your project directory
-        3. Follow the setup instructions
-        4. Start using SDD commands!
-        
-        ## 📝 Changes in this release
-        $COMMITS
-        
-        ## 🔧 Requirements
-        - Python 3.11+
-        - Your chosen AI coding assistant
-        - Git
-        - GitHub CLI (optional)
+        Download the template for your preferred AI assistant:
+        - sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.zip
+        - sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.zip  
+        - sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.zip
         EOF
         
         echo "Generated release notes:"
@@ -183,11 +150,8 @@ jobs:
       if: steps.check_release.outputs.exists == 'false'
       run: |
         gh release create ${{ steps.get_tag.outputs.new_version }} \
-          sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.tar.gz \
           sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.zip \
-          sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.tar.gz \
           sdd-template-gemini-${{ steps.get_tag.outputs.new_version }}.zip \
-          sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.tar.gz \
           sdd-template-copilot-${{ steps.get_tag.outputs.new_version }}.zip \
           --title "SDD Template ${{ steps.get_tag.outputs.new_version }}" \
           --notes-file release_notes.md

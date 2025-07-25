@@ -130,7 +130,7 @@ specify check  # Verify all tools are installed
 You can also use this repository as a template to get started with your preferred AI agent and SDD.
 
 1. Clone this repository.
-1. Launch the agent from inside the `base` folder (where `CLAUDE.md` and `.claude` are located).
+1. Launch the agent from inside the `base` folder (where `CLAUDE.md` and `agent_templates/` are located).
 1. Start iterating on the project following the steps below.
 
 >[!IMPORTANT]
