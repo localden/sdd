@@ -503,7 +503,6 @@ def check():
     console.print("\n[cyan]Optional AI tools:[/cyan]")
     claude_ok = check_tool("claude", "Install from: https://docs.anthropic.com/en/docs/claude-code/setup")
     gemini_ok = check_tool("gemini", "Install from: https://github.com/google-gemini/gemini-cli")
-    console.print("   GitHub Copilot: Available in VS Code and supported IDEs")
     
     if all_ok:
         console.print("\n[green]✓ All required tools installed![/green]")

@@ -81,17 +81,15 @@ Our research and experimentation focus on:
 
 To use this repository effectively:
 
+- **Linux** ([WSL2](https://learn.microsoft.com/windows/wsl/install) if you're using Windows) or **macOS**
+    - This is required for the embedded helper scripts. In the future, we will support Windows natively as well.
 - Agentic AI developer tools:
-    - [Visual Studio Code](https://code.visualstudio.com/)
+    - [Visual Studio Code with GitHub Copilot](https://code.visualstudio.com/)
     - [Claude Code](https://www.anthropic.com/claude-code)
     - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
-    - [Codex CLI](https://help.openai.com/en/articles/11096431-openai-codex-cli-getting-started)
 
 >[!NOTE]
 >While the repository uses Claude Code conventions, the pattern is applicable to _any_ modern agentic AI tool.
-
->[!IMPORTANT]
->One of the key components for the AI tools is the **constitution file**, which defines non-negotiable principles that it must follow when building the application. It defines the key tenets that must not be violated through _any_ of the steps in the process.
 
 ## 🚀 Quick Start
 
@@ -99,13 +97,10 @@ To use this repository effectively:
 
 Start by reading the core documents to familiarize yourself with the principles:
 
-1. **`sdd.md`** - The complete SDD methodology.
-2. **`specify-proposal.md`** - Vision for tooling to support SDD.
+1. [**`sdd.md`**](./sdd.md) - The complete SDD methodology.
+2. [**`specify-proposal.md`**](./specify-proposal.md) - Vision for tooling to support SDD.
 
 ### Using the CLI
-
->[!IMPORTANT]
->This documentation is being written as the tool is being re-designed. **Stay tuned in a few hours!**
 
 #### Option 1: Using uvx (No Installation)
 
