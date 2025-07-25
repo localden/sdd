@@ -87,6 +87,11 @@ jobs:
             mv sdd-gemini-package/.gemini/GEMINI.md sdd-gemini-package/GEMINI.md
             echo "Moved GEMINI.md to root of Gemini package"
           fi
+          # Remove empty .gemini folder if it only contained GEMINI.md
+          if [ -d "sdd-gemini-package/.gemini" ] && [ -z "$(find sdd-gemini-package/.gemini -type f)" ]; then
+            rm -rf sdd-gemini-package/.gemini
+            echo "Removed empty .gemini folder"
+          fi
           echo "Created Gemini CLI package"
         fi
         
