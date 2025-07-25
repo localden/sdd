@@ -33,7 +33,6 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 from rich.align import Align
-from rich.prompt import Prompt
 from rich.live import Live
 from rich.table import Table
 from typer.core import TyperGroup
@@ -43,6 +42,18 @@ try:
     import msvcrt  # Windows
 except ImportError:
     import termios, tty  # Unix/Linux/Mac
+
+# Constants
+AI_CHOICES = {
+    "claude": "Claude Code",
+    "gemini": "Gemini CLI", 
+    "copilot": "GitHub Copilot"
+}
+
+CRITICAL_TOOLS = [
+    ("git", "https://git-scm.com/downloads"),
+    ("gh", "https://cli.github.com/")
+]
 
 # ASCII Art Banner
 BANNER = """
@@ -254,9 +265,7 @@ def download_and_extract_template(project_name: str, ai_assistant: str) -> Path:
     """Download the latest release and extract it to create a new project."""
     project_path = Path(project_name).resolve()
     
-    if project_path.exists():
-        console.print(f"[red]Error:[/red] Directory '{project_name}' already exists")
-        raise typer.Exit(1)
+    # Note: Directory existence is already checked in the init command
     
     with Progress(
         SpinnerColumn(),
@@ -340,8 +349,6 @@ def download_and_extract_template(project_name: str, ai_assistant: str) -> Path:
                 raise typer.Exit(1)
                 
             progress.update(task, completed=True)
-        
-        progress.update(task, completed=True)
     
     return project_path
 
@@ -388,9 +395,7 @@ def init(
     console.print("\n[bold]Checking required tools...[/bold]")
     
     # Check critical tools (can't proceed without these)
-    critical_tools_ok = True
-    critical_tools_ok &= check_tool("git", "https://git-scm.com/downloads")
-    critical_tools_ok &= check_tool("gh", "https://cli.github.com/")
+    critical_tools_ok = all(check_tool(tool, hint) for tool, hint in CRITICAL_TOOLS)
     
     if not critical_tools_ok:
         console.print("\n[red]Critical tools are missing![/red]")
@@ -398,26 +403,20 @@ def init(
         raise typer.Exit(1)
     
     # AI assistant selection
-    ai_choices = {
-        "claude": "Claude Code",
-        "gemini": "Gemini CLI",
-        "copilot": "GitHub Copilot"
-    }
-    
     if ai_assistant:
-        if ai_assistant not in ai_choices:
-            console.print(f"[red]Error:[/red] Invalid AI assistant '{ai_assistant}'. Choose from: {', '.join(ai_choices.keys())}")
+        if ai_assistant not in AI_CHOICES:
+            console.print(f"[red]Error:[/red] Invalid AI assistant '{ai_assistant}'. Choose from: {', '.join(AI_CHOICES.keys())}")
             raise typer.Exit(1)
         selected_ai = ai_assistant
     else:
         # Use arrow-key selection interface
         selected_ai = select_with_arrows(
-            ai_choices, 
+            AI_CHOICES, 
             "Choose your AI assistant:", 
             "claude"
         )
     
-    console.print(f"[green]✓ Selected AI assistant:[/green] {ai_choices[selected_ai]}")
+    console.print(f"[green]✓ Selected AI assistant:[/green] {AI_CHOICES[selected_ai]}")
     
     # Check agent tools unless ignored
     if not ignore_agent_tools:
@@ -448,7 +447,6 @@ def init(
         console.print(f"[red]Failed to set up project:[/red] {e}")
         # Clean up partial directory if it was created
         if os.path.exists(project_name):
-            import shutil
             shutil.rmtree(project_name)
         raise typer.Exit(1)
     
@@ -489,14 +487,13 @@ def check():
     show_banner()
     console.print("[bold]Checking Specify4 requirements...[/bold]\n")
     
-    all_ok = True
-    all_ok &= check_tool("git", "https://git-scm.com/downloads")
-    all_ok &= check_tool("gh", "https://cli.github.com/")
+    # Check critical tools
+    all_ok = all(check_tool(tool, hint) for tool, hint in CRITICAL_TOOLS)
     all_ok &= check_tool("uv", "curl -LsSf https://astral.sh/uv/install.sh | sh")
     
     console.print("\n[cyan]Optional AI tools:[/cyan]")
-    claude_ok = check_tool("claude", "Claude Code extension for VSCode")
-    gemini_ok = check_tool("gemini", "https://github.com/google/generative-ai-cli")
+    claude_ok = check_tool("claude", "https://docs.anthropic.com/en/docs/claude-code/setup")
+    gemini_ok = check_tool("gemini", "https://github.com/google-gemini/gemini-cli")
     console.print("   GitHub Copilot: Available in VSCode and supported IDEs")
     
     if all_ok:
