@@ -87,6 +87,8 @@ To use this repository effectively:
     - [Visual Studio Code with GitHub Copilot](https://code.visualstudio.com/)
     - [Claude Code](https://www.anthropic.com/claude-code)
     - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+- [uv](https://docs.astral.sh/uv/)
+- [Python 3.12](https://www.python.org/downloads/) at least
 
 >[!NOTE]
 >While the repository uses Claude Code conventions, the pattern is applicable to _any_ modern agentic AI tool.
@@ -114,22 +116,29 @@ uvx --from git+https://github.com/localden/sdd.git specify init my-project
 ```bash
 # Install the Specify CLI tool globally
 uv tool install git+https://github.com/localden/sdd.git
-
-# Now use it anywhere
-specify init <project-name>
-specify check  # Verify all tools are installed
 ```
 
-### Repository as a template
+### STEP 0: Initialize your project
 
-You can also use this repository as a template to get started with your preferred AI agent and SDD.
+You can use the Specify CLI to bootstrap your project. Run:
 
-1. Clone this repository.
-1. Launch the agent from inside the `base` folder (where `CLAUDE.md` and `agent_templates/` are located).
-1. Start iterating on the project following the steps below.
+```bash
+specify init <project_name>
+```
 
->[!IMPORTANT]
->You can use alternative agent instruction files, like `GEMINI.md` for Gemini CLI and `AGENTS.md` for Codex CLI.
+You will be prompted to select the AI agent you are using. You can also proactively specify it directly in the terminal:
+
+```bash
+specify init <project_name> --ai claude
+specify init <project_name> --ai gemini
+specify init <project_name> --ai copilot
+```
+
+The CLI will check if you have Claude Code or Gemini CLI installed. If you do not, or you prefer to get the templates without checking for the right tools, use:
+
+```bash
+specify init <project_name> --ai claude --ignore-agent-tools
+```
 
 ### STEP 1: Bootstrap the project
 
