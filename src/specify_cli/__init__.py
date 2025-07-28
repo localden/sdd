@@ -96,7 +96,7 @@ def get_key():
         key = sys.stdin.read(1)
         if key == '\x1b':  # Escape sequence
             # Check for arrow keys with a short timeout to distinguish from Esc key
-            if select.select([sys.stdin], [], [], 0.02)[0]:
+            if select.select([sys.stdin], [], [], 0.05)[0]:
                 seq = sys.stdin.read(2)
                 if seq == '[A':
                     return 'up'
@@ -172,8 +172,7 @@ def select_with_arrows(options: dict, prompt_text: str = "Select an option", def
                         console.print("\n[yellow]Selection cancelled[/yellow]")
                         raise typer.Exit(1)
                     
-                    live.update(create_selection_panel())
-                    live.refresh()
+                    live.update(create_selection_panel(), refresh=True)
 
                 except KeyboardInterrupt:
                     console.print("\n[yellow]Selection cancelled[/yellow]")
