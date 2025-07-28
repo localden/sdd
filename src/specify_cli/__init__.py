@@ -129,26 +129,23 @@ def select_with_arrows(options: dict, prompt_text: str = "Select an option", def
     else:
         selected_index = 0
     
+    selected_key = None
+
     def create_selection_panel():
         """Create the selection panel with current selection highlighted."""
-        # Create the options table
         table = Table.grid(padding=(0, 2))
         table.add_column(style="bright_cyan", justify="left", width=3)
         table.add_column(style="white", justify="left")
         
         for i, key in enumerate(option_keys):
             if i == selected_index:
-                # Highlighted option with arrow
                 table.add_row("▶", f"[bright_cyan]{key}: {options[key]}[/bright_cyan]")
             else:
-                # Normal option
                 table.add_row(" ", f"[white]{key}: {options[key]}[/white]")
         
-        # Add instructions at the bottom
         table.add_row("", "")
-        table.add_row("", "[dim]Use ↑/↓ arrow keys to navigate, Enter to select, Esc to cancel[/dim]")
+        table.add_row("", "[dim]Use ↑/↓ to navigate, Enter to select, Esc to cancel[/dim]")
         
-        # Create the main panel
         return Panel(
             table,
             title=f"[bold]{prompt_text}[/bold]",
@@ -156,39 +153,50 @@ def select_with_arrows(options: dict, prompt_text: str = "Select an option", def
             padding=(1, 2)
         )
     
-    console.print()  # Add some spacing
-    
-    # Use Live display for updating selection
-    with Live(create_selection_panel(), console=console, transient=True, auto_refresh=False) as live:
-        while True:
-            try:
-                key = get_key()
-                
-                if key == 'up':
-                    selected_index = (selected_index - 1) % len(option_keys)
+    console.print()
+
+    def run_selection_loop():
+        nonlocal selected_key, selected_index
+        with Live(create_selection_panel(), console=console, transient=True, auto_refresh=False) as live:
+            while True:
+                try:
+                    key = get_key()
+                    if key == 'up':
+                        selected_index = (selected_index - 1) % len(option_keys)
+                    elif key == 'down':
+                        selected_index = (selected_index + 1) % len(option_keys)
+                    elif key == 'enter':
+                        selected_key = option_keys[selected_index]
+                        break
+                    elif key == 'escape':
+                        console.print("\n[yellow]Selection cancelled[/yellow]")
+                        raise typer.Exit(1)
+                    
                     live.update(create_selection_panel())
                     live.refresh()
-                    
-                elif key == 'down':
-                    selected_index = (selected_index + 1) % len(option_keys)
-                    live.update(create_selection_panel())
-                    live.refresh()
-                    
-                elif key == 'enter':
-                    selected_key = option_keys[selected_index]
-                    break
-                    
-                elif key == 'escape':
+
+                except KeyboardInterrupt:
                     console.print("\n[yellow]Selection cancelled[/yellow]")
                     raise typer.Exit(1)
-                    
-            except KeyboardInterrupt:
-                console.print("\n[yellow]Selection cancelled[/yellow]")
-                raise typer.Exit(1)
-    
-    # Show final selection
+
+    if sys.platform != "win32":
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setcbreak(sys.stdin.fileno())
+            run_selection_loop()
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    else:
+        run_selection_loop()
+
+    if selected_key is None:
+        console.print("\n[red]Selection failed.[/red]")
+        raise typer.Exit(1)
+
     console.print(f"\n[green]✓ Selected:[/green] {selected_key}: {options[selected_key]}")
     return selected_key
+
 
 
 console = Console()
