@@ -5,6 +5,7 @@
 #     "typer",
 #     "rich",
 #     "platformdirs",
+#     "readchar",
 # ]
 # ///
 """
@@ -38,10 +39,7 @@ from rich.table import Table
 from typer.core import TyperGroup
 
 # For cross-platform keyboard input
-try:
-    import msvcrt  # Windows
-except ImportError:
-    import termios, tty, select  # Unix/Linux/Mac
+import readchar
 
 # Constants
 AI_CHOICES = {
@@ -73,41 +71,28 @@ MINI_BANNER = """
 """
 
 def get_key():
-    """Get a single keypress in a cross-platform way.
+    """Get a single keypress in a cross-platform way using readchar."""
+    key = readchar.readkey()
     
-    For Unix/Mac, this function assumes the terminal is already in cbreak mode.
-    """
-    if sys.platform == "win32":
-        # Windows
-        key = msvcrt.getch()
-        if key == b'\xe0':  # Special key prefix on Windows
-            key = msvcrt.getch()
-            if key == b'H':  # Up arrow
-                return 'up'
-            elif key == b'P':  # Down arrow
-                return 'down'
-        elif key == b'\r':  # Enter
-            return 'enter'
-        elif key == b'\x1b':  # Escape
-            return 'escape'
-        return key.decode('utf-8', errors='ignore')
-    else:
-        # Unix/Linux/Mac - assumes terminal is in cbreak mode
-        key = sys.stdin.read(1)
-        if key == '\x1b':  # Escape sequence
-            # Check for arrow keys with a short timeout to distinguish from Esc key
-            if select.select([sys.stdin], [], [], 0.05)[0]:
-                seq = sys.stdin.read(2)
-                if seq == '[A':
-                    return 'up'
-                elif seq == '[B':
-                    return 'down'
-            return 'escape'
-        elif key == '\r' or key == '\n':
-            return 'enter'
-        elif key == '\x03':  # Ctrl+C
-            raise KeyboardInterrupt
-        return key
+    # Arrow keys
+    if key == readchar.key.UP:
+        return 'up'
+    if key == readchar.key.DOWN:
+        return 'down'
+    
+    # Enter/Return
+    if key == readchar.key.ENTER:
+        return 'enter'
+    
+    # Escape
+    if key == readchar.key.ESC:
+        return 'escape'
+        
+    # Ctrl+C
+    if key == readchar.key.CTRL_C:
+        raise KeyboardInterrupt
+
+    return key
 
 
 
@@ -178,16 +163,7 @@ def select_with_arrows(options: dict, prompt_text: str = "Select an option", def
                     console.print("\n[yellow]Selection cancelled[/yellow]")
                     raise typer.Exit(1)
 
-    if sys.platform != "win32":
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setcbreak(sys.stdin.fileno())
-            run_selection_loop()
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-    else:
-        run_selection_loop()
+    run_selection_loop()
 
     if selected_key is None:
         console.print("\n[red]Selection failed.[/red]")
