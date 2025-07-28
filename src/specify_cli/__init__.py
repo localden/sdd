@@ -41,7 +41,7 @@ from typer.core import TyperGroup
 try:
     import msvcrt  # Windows
 except ImportError:
-    import termios, tty  # Unix/Linux/Mac
+    import termios, tty, select  # Unix/Linux/Mac
 
 # Constants
 AI_CHOICES = {
@@ -96,15 +96,31 @@ def get_key():
             tty.setraw(sys.stdin.fileno())
             key = sys.stdin.read(1)
             if key == '\x1b':  # Escape sequence
-                key += sys.stdin.read(2)
-                if key == '\x1b[A':  # Up arrow
-                    return 'up'
-                elif key == '\x1b[B':  # Down arrow
-                    return 'down'
+                # Check if there are more characters available with a short timeout
+                if select.select([sys.stdin], [], [], 0.1)[0]:
+                    # Read the next character
+                    next_char = sys.stdin.read(1)
+                    if next_char == '[':
+                        # ANSI escape sequence, read one more character
+                        if select.select([sys.stdin], [], [], 0.1)[0]:
+                            final_char = sys.stdin.read(1)
+                            if final_char == 'A':  # Up arrow
+                                return 'up'
+                            elif final_char == 'B':  # Down arrow
+                                return 'down'
+                            # Other ANSI sequences we don't handle, return escape
+                            return 'escape'
+                        else:
+                            # Incomplete sequence, return escape
+                            return 'escape'
+                    else:
+                        # Not an ANSI sequence, return escape
+                        return 'escape'
+                else:
+                    # Just an escape key pressed
+                    return 'escape'
             elif key == '\r' or key == '\n':  # Enter
                 return 'enter'
-            elif key == '\x1b':  # Escape
-                return 'escape'
             return key
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
