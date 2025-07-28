@@ -100,7 +100,7 @@ def get_key():
             
             if key == '\x1b':  # Escape sequence
                 # Check if more characters available (arrow keys)
-                if select.select([sys.stdin], [], [], 0.1)[0]:
+                if select.select([sys.stdin], [], [], 0.0)[0]:
                     seq = sys.stdin.read(2)
                     if seq == '[A':  # Up arrow
                         return 'up'
