@@ -37,9 +37,9 @@ TEMP_FILE=$(mktemp)
 if [ ! -f "$CLAUDE_MD" ]; then
     echo "Creating new CLAUDE.md for your project..."
     
-    # Check if this is the Specify4 repo itself
+    # Check if this is the Specify repo itself
     if [ -f "$REPO_ROOT/agent_templates/claude/commands/specify.md" ] && [ -f "$REPO_ROOT/templates/CLAUDE-template.md" ]; then
-        echo "Note: Replacing Specify4's CLAUDE.md with project-specific version"
+        echo "Note: Replacing Specify's CLAUDE.md with project-specific version"
     fi
     
     cp "$REPO_ROOT/templates/CLAUDE-template.md" "$TEMP_FILE"

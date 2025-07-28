@@ -1,8 +1,8 @@
-# Specify4 Development Guidelines
+# Specify Development Guidelines
 
-**This file is for developing Specify4 itself. When you copy this repo as a template and run `/plan`, it will be replaced with your project-specific CLAUDE.md.**
+**This file is for developing Specify itself. When you copy this repo as a template and run `/plan`, it will be replaced with your project-specific CLAUDE.md.**
 
-You are working on Specify4, a spec-driven development tool. Follow these constitutional principles during all development.
+You are working on Specify, a spec-driven development tool. Follow these constitutional principles during all development.
 
 ## Core Principles
 
