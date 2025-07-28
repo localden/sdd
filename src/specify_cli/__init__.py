@@ -252,12 +252,24 @@ def check_tool(tool: str, install_hint: str) -> bool:
 
 
 def is_git_repo(path: Path = None) -> bool:
-    """Check if the current directory or specified path is a git repository."""
+    """Check if the specified path is inside a git repository."""
     if path is None:
         path = Path.cwd()
     
-    git_dir = path / ".git"
-    return git_dir.exists() and git_dir.is_dir()
+    if not path.is_dir():
+        return False
+
+    try:
+        # Use git command to check if inside a work tree
+        subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            check=True,
+            capture_output=True,
+            cwd=path,
+        )
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
 
 
 def init_git_repo(project_path: Path) -> bool:
