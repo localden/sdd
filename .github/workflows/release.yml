@@ -68,6 +68,11 @@ jobs:
           cp -r scripts sdd-package-base/
           echo "Copied scripts folder"
         fi
+
+        if [ -d "templates" ]; then
+          cp -r templates sdd-package-base/
+          echo "Copied templates folder"
+        fi
         
         # Create Claude Code package
         mkdir -p sdd-claude-package

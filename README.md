@@ -143,12 +143,10 @@ specify init <project_name> --ai claude --ignore-agent-tools
 
 ### STEP 1: Bootstrap the project
 
-The first step should be creating a new project scaffolding. Use `/new_feature` and then specify the concrete requirements for the project you want to develop.
-
-![GIF showing Claude Code execution in an Ubuntu terminal](media/claude-code-starter.gif)
+The first step should be creating a new project scaffolding. Use `/specify` command and then provide the concrete requirements for the project you want to develop.
 
 >[!IMPORTANT]
->Be as explicit as possible about what you are trying to build. Typically, you might want to consider voice interaction with the model.
+>Be as explicit as possible about _what_ you are trying to build and _why_. **Do not focus on the tech stack at this point**.
 
 An example prompt, as described by John Lam, can be:
 
@@ -173,13 +171,9 @@ delete any comments that you made, but you can't delete comments anybody else ma
 
 After this prompt is entered, you should see Claude Code kick off the planning and spec drafting process.
 
-![Claude Code performing the planning and spec writing steps](media/new-feature-process.png)
-
 Once this step is completed, you should have a new branch created (e.g., `001-create-taskify`), as well as a new specification in the `specs/001-create-taskify` directory.
 
 The produced specification should contain a set of user stories and functional requirements.
-
-![GIF showing the output specification produced by Claude Code](media/output-spec.gif)
 
 ### STEP 2: Functional specification clarification
 
