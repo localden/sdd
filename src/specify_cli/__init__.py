@@ -73,7 +73,10 @@ MINI_BANNER = """
 """
 
 def get_key():
-    """Get a single keypress in a cross-platform way."""
+    """Get a single keypress in a cross-platform way.
+    
+    For Unix/Mac, this function assumes the terminal is already in cbreak mode.
+    """
     if sys.platform == "win32":
         # Windows
         key = msvcrt.getch()
@@ -89,32 +92,23 @@ def get_key():
             return 'escape'
         return key.decode('utf-8', errors='ignore')
     else:
-        # Unix/Linux/Mac - use cbreak mode to work better with Rich Live
-        fd = sys.stdin.fileno()
-        old_settings = termios.tcgetattr(fd)
-        try:
-            tty.setcbreak(sys.stdin.fileno())  # Use cbreak mode
-            
-            # Read one character
-            key = sys.stdin.read(1)
-            
-            if key == '\x1b':  # Escape sequence
-                # Check if more characters available (arrow keys)
-                if select.select([sys.stdin], [], [], 0.0)[0]:
-                    seq = sys.stdin.read(2)
-                    if seq == '[A':  # Up arrow
-                        return 'up'
-                    elif seq == '[B':  # Down arrow
-                        return 'down'
-                # Just escape key
-                return 'escape'
-            elif key == '\r' or key == '\n':  # Enter
-                return 'enter'
-            elif key == '\x03':  # Ctrl+C
-                raise KeyboardInterrupt
-            return key
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        # Unix/Linux/Mac - assumes terminal is in cbreak mode
+        key = sys.stdin.read(1)
+        if key == '\x1b':  # Escape sequence
+            # Check for arrow keys with a short timeout to distinguish from Esc key
+            if select.select([sys.stdin], [], [], 0.02)[0]:
+                seq = sys.stdin.read(2)
+                if seq == '[A':
+                    return 'up'
+                elif seq == '[B':
+                    return 'down'
+            return 'escape'
+        elif key == '\r' or key == '\n':
+            return 'enter'
+        elif key == '\x03':  # Ctrl+C
+            raise KeyboardInterrupt
+        return key
+
 
 
 def select_with_arrows(options: dict, prompt_text: str = "Select an option", default_key: str = None) -> str:
