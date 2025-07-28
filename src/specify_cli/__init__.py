@@ -32,8 +32,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
-from rich.align import Align
 from rich.live import Live
+from rich.align import Align
 from rich.table import Table
 from typer.core import TyperGroup
 
@@ -89,38 +89,29 @@ def get_key():
             return 'escape'
         return key.decode('utf-8', errors='ignore')
     else:
-        # Unix/Linux/Mac
+        # Unix/Linux/Mac - use cbreak mode to work better with Rich Live
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
-            tty.setraw(sys.stdin.fileno())
+            tty.setcbreak(sys.stdin.fileno())  # Use cbreak mode
+            
+            # Read one character
             key = sys.stdin.read(1)
+            
             if key == '\x1b':  # Escape sequence
-                # Check if there are more characters available with a short timeout
+                # Check if more characters available (arrow keys)
                 if select.select([sys.stdin], [], [], 0.1)[0]:
-                    # Read the next character
-                    next_char = sys.stdin.read(1)
-                    if next_char == '[':
-                        # ANSI escape sequence, read one more character
-                        if select.select([sys.stdin], [], [], 0.1)[0]:
-                            final_char = sys.stdin.read(1)
-                            if final_char == 'A':  # Up arrow
-                                return 'up'
-                            elif final_char == 'B':  # Down arrow
-                                return 'down'
-                            # Other ANSI sequences we don't handle, return escape
-                            return 'escape'
-                        else:
-                            # Incomplete sequence, return escape
-                            return 'escape'
-                    else:
-                        # Not an ANSI sequence, return escape
-                        return 'escape'
-                else:
-                    # Just an escape key pressed
-                    return 'escape'
+                    seq = sys.stdin.read(2)
+                    if seq == '[A':  # Up arrow
+                        return 'up'
+                    elif seq == '[B':  # Down arrow
+                        return 'down'
+                # Just escape key
+                return 'escape'
             elif key == '\r' or key == '\n':  # Enter
                 return 'enter'
+            elif key == '\x03':  # Ctrl+C
+                raise KeyboardInterrupt
             return key
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
@@ -144,8 +135,8 @@ def select_with_arrows(options: dict, prompt_text: str = "Select an option", def
     else:
         selected_index = 0
     
-    def create_selection_display():
-        """Create the selection display."""
+    def create_selection_panel():
+        """Create the selection panel with current selection highlighted."""
         # Create the options table
         table = Table.grid(padding=(0, 2))
         table.add_column(style="bright_cyan", justify="left", width=3)
@@ -164,34 +155,41 @@ def select_with_arrows(options: dict, prompt_text: str = "Select an option", def
         table.add_row("", "[dim]Use ↑/↓ arrow keys to navigate, Enter to select, Esc to cancel[/dim]")
         
         # Create the main panel
-        panel = Panel(
+        return Panel(
             table,
             title=f"[bold]{prompt_text}[/bold]",
             border_style="cyan",
             padding=(1, 2)
         )
-        
-        return panel
     
-    # Start the Live display
-    with Live(create_selection_display(), console=console, refresh_per_second=10) as live:
+    console.print()  # Add some spacing
+    
+    # Use Live display for updating selection
+    with Live(create_selection_panel(), console=console, transient=True, auto_refresh=False) as live:
         while True:
-            key = get_key()
-            
-            if key == 'up':
-                selected_index = (selected_index - 1) % len(option_keys)
-                live.update(create_selection_display())
+            try:
+                key = get_key()
                 
-            elif key == 'down':
-                selected_index = (selected_index + 1) % len(option_keys)
-                live.update(create_selection_display())
-                
-            elif key == 'enter':
-                selected_key = option_keys[selected_index]
-                break
-                
-            elif key == 'escape':
-                console.print("[yellow]Selection cancelled[/yellow]")
+                if key == 'up':
+                    selected_index = (selected_index - 1) % len(option_keys)
+                    live.update(create_selection_panel())
+                    live.refresh()
+                    
+                elif key == 'down':
+                    selected_index = (selected_index + 1) % len(option_keys)
+                    live.update(create_selection_panel())
+                    live.refresh()
+                    
+                elif key == 'enter':
+                    selected_key = option_keys[selected_index]
+                    break
+                    
+                elif key == 'escape':
+                    console.print("\n[yellow]Selection cancelled[/yellow]")
+                    raise typer.Exit(1)
+                    
+            except KeyboardInterrupt:
+                console.print("\n[yellow]Selection cancelled[/yellow]")
                 raise typer.Exit(1)
     
     # Show final selection
