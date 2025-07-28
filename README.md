@@ -37,7 +37,7 @@ Specification-Driven Development (SDD) **flips the script** on traditional softw
 
 SDD is a structured process that emphasizes:
 
-- **Intent-driven development** where specifications define the "what" before the "how"
+- **Intent-driven development** where specifications define the "_what_" before the "_how_"
 - **Rich specification creation** using guardrails and organizational principles
 - **Multi-step refinement** rather than one-shot code generation from prompts
 - **Heavy reliance** on advanced AI model capabilities for specification interpretation
@@ -45,7 +45,7 @@ SDD is a structured process that emphasizes:
 ## 🌟 Development Phases
 
 | Phase | Focus | Key Activities |
-| --- | --- | --- |
+|-------|-------|----------------|
 | **0-to-1 Development** ("Greenfield") | Generate from scratch | <ul><li>Start with high-level requirements</li><li>Generate specifications</li><li>Plan implementation steps</li><li>Build production-ready applications</li></ul> |
 | **Creative Exploration** | Parallel implementations | <ul><li>Explore diverse solutions</li><li>Support multiple technology stacks & architectures</li><li>Experiment with UX patterns</li></ul> |
 | **Iterative Enhancement** ("Brownfield") | Brownfield modernization | <ul><li>Add features iteratively</li><li>Modernize legacy systems</li><li>Adapt processes</li></ul> |
@@ -57,7 +57,7 @@ Our research and experimentation focus on:
 ### Technology Independence
 
 - Create applications using diverse technology stacks
-- Prove that SDD is a process, not tied to specific technologies
+- Validate the hypothesis that SDD is a process not tied to specific technologies, programming languages, or frameworks
 
 ### Enterprise Constraints
 
@@ -81,16 +81,16 @@ Our research and experimentation focus on:
 To use this repository effectively:
 
 - **Linux** ([WSL2](https://learn.microsoft.com/windows/wsl/install) if you're using Windows) or **macOS**
-    - This is required for the embedded helper scripts. In the future, we will support Windows natively as well.
+      - This is required for the embedded helper scripts. In the future, we will support Windows natively as well.
 - Agentic AI developer tools:
-    - [Visual Studio Code with GitHub Copilot](https://code.visualstudio.com/)
-    - [Claude Code](https://www.anthropic.com/claude-code)
-    - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
-- [uv](https://docs.astral.sh/uv/)
+      - [Visual Studio Code with GitHub Copilot](https://code.visualstudio.com/)
+      - [Claude Code](https://www.anthropic.com/claude-code)
+      - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+- [uv](https://docs.astral.sh/uv/) - we use this instead of `pip` for package management
 - [Python 3.12](https://www.python.org/downloads/) at least
 
 >[!NOTE]
->While the repository uses Claude Code conventions, the pattern is applicable to _any_ modern agentic AI tool.
+>While the repository uses Claude Code conventions, the pattern is applicable to _any_ modern agentic AI tool. You might need to make certain tweaks to get it to work properly.
 
 ## 🚀 Quick Start
 
@@ -103,27 +103,29 @@ Start by reading the core documents to familiarize yourself with the principles:
 
 ### Using the CLI
 
-#### Option 1: Using uvx (No Installation)
+To help bootstrap the process, we have build a Command Line Interface (CLI) tool, called `specify`, that will help you create the required artifacts for your project. To bootstrap a project, you will need to use the `specify init` command.
+
+#### Option 1: Using uvx (no installation)
 
 ```bash
-# Run directly without installing anything
-uvx --from git+https://github.com/localden/sdd.git specify init my-project
+uvx --from git+https://github.com/localden/sdd.git specify init <PROJECT_NAME>
 ```
 
-#### Option 2: Install Globally
+#### Option 2: Install globally
 
 ```bash
-# Install the Specify CLI tool globally
 uv tool install git+https://github.com/localden/sdd.git
 ```
 
 ### STEP 0: Initialize your project
 
-You can use the Specify CLI to bootstrap your project. Run:
+You can use the Specify CLI to bootstrap your project, which will bring in the required artifacts in your environment. Run:
 
 ```bash
 specify init <project_name>
 ```
+
+![Specify CLI bootstrapping a new project](./media/specify_cli.gif)
 
 You will be prompted to select the AI agent you are using. You can also proactively specify it directly in the terminal:
 
@@ -133,7 +135,7 @@ specify init <project_name> --ai gemini
 specify init <project_name> --ai copilot
 ```
 
-The CLI will check if you have Claude Code or Gemini CLI installed. If you do not, or you prefer to get the templates without checking for the right tools, use:
+The CLI will check if you have Claude Code or Gemini CLI installed. If you do not, or you prefer to get the templates without checking for the right tools, use `--ignore-agent-tools` with your command:
 
 ```bash
 specify init <project_name> --ai claude --ignore-agent-tools
