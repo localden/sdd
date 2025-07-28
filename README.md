@@ -125,7 +125,7 @@ You can use the Specify CLI to bootstrap your project, which will bring in the r
 specify init <project_name>
 ```
 
-![Specify CLI bootstrapping a new project](./media/specify_cli.gif)
+![Specify CLI bootstrapping a new project in the terminal](./media/specify_cli.gif)
 
 You will be prompted to select the AI agent you are using. You can also proactively specify it directly in the terminal:
 
