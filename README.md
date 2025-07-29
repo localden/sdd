@@ -1,11 +1,11 @@
 <div align="center">
     <img src="./media/logo_small.webp"/>
     <h1>🌱 Specification-Driven Development (SDD)</h1>
-    <h3><em>Transforming intent into reality</em></h3>
+    <h3><em>Build high-quality software - faster.</em></h3>
 </div>
 
 <p align="center">
-    <strong>An effort to fundamentally invert the traditional relationship between specifications and code.</strong>
+    <strong>An effort to allow organizations to focus on product scenarios rather than writing undifferentiated code.</strong>
 </p>
 
 >[!NOTE]
