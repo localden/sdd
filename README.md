@@ -211,18 +211,18 @@ At this stage, your project folder contents should resemble the following:
 
 ```text
 ├── memory
-│		 ├── constitution.md
-│		 └── constitution_update_checklist.md
+│	 ├── constitution.md
+│	 └── constitution_update_checklist.md
 ├── scripts
-│		 ├── check-task-prerequisites.sh
-│		 ├── common.sh
-│		 ├── create-new-feature.sh
-│		 ├── get-feature-paths.sh
-│		 ├── setup-plan.sh
-│		 └── update-claude-md.sh
+│	 ├── check-task-prerequisites.sh
+│	 ├── common.sh
+│	 ├── create-new-feature.sh
+│	 ├── get-feature-paths.sh
+│	 ├── setup-plan.sh
+│	 └── update-claude-md.sh
 ├── specs
-│		 └── 002-create-taskify
-│		     └── spec.md
+│	 └── 002-create-taskify
+│	     └── spec.md
 └── templates
     ├── CLAUDE-template.md
     ├── plan-template.md
@@ -265,25 +265,25 @@ The output of this step will include a number of implementation detail documents
 .
 ├── CLAUDE.md
 ├── memory
-│		 ├── constitution.md
-│		 └── constitution_update_checklist.md
+│	 ├── constitution.md
+│	 └── constitution_update_checklist.md
 ├── scripts
-│		 ├── check-task-prerequisites.sh
-│		 ├── common.sh
-│		 ├── create-new-feature.sh
-│		 ├── get-feature-paths.sh
-│		 ├── setup-plan.sh
-│		 └── update-claude-md.sh
+│	 ├── check-task-prerequisites.sh
+│	 ├── common.sh
+│	 ├── create-new-feature.sh
+│	 ├── get-feature-paths.sh
+│	 ├── setup-plan.sh
+│	 └── update-claude-md.sh
 ├── specs
-│		 └── 002-create-taskify
-│		     ├── contracts
-│		     │		 ├── api-spec.json
-│		     │		 └── signalr-spec.md
-│		     ├── data-model.md
-│		     ├── plan.md
-│		     ├── quickstart.md
-│		     ├── research.md
-│		     └── spec.md
+│	 └── 002-create-taskify
+│	     ├── contracts
+│	     │	 ├── api-spec.json
+│	     │	 └── signalr-spec.md
+│	     ├── data-model.md
+│	     ├── plan.md
+│	     ├── quickstart.md
+│	     ├── research.md
+│	     └── spec.md
 └── templates
     ├── CLAUDE-template.md
     ├── plan-template.md
@@ -343,7 +343,7 @@ You can also ask Claude Code (if you have the [GitHub CLI](https://docs.github.c
 Once ready, instruct Claude Code to implement your solution (example path included):
 
 ```text
-implement specs/002-taskify-kanban/plan.md
+implement specs/002-create-taskify/plan.md
 ```
 
 Claude Code will spring into action and will start creating the implementation.
