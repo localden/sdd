@@ -33,7 +33,7 @@
 
 Specification-Driven Development (SDD) **flips the script** on traditional software development. For decades, code has been king — specifications were just scaffolding we built and discarded once the "real work" of coding began. SDD changes this: **specifications become executable**, directly generating working implementations rather than just guiding them.
 
-## 📚 Core Philosophy
+## 📚 Core philosophy
 
 SDD is a structured process that emphasizes:
 
@@ -42,7 +42,7 @@ SDD is a structured process that emphasizes:
 - **Multi-step refinement** rather than one-shot code generation from prompts
 - **Heavy reliance** on advanced AI model capabilities for specification interpretation
 
-## 🌟 Development Phases
+## 🌟 Development phases
 
 | Phase | Focus | Key Activities |
 |-------|-------|----------------|
@@ -50,27 +50,27 @@ SDD is a structured process that emphasizes:
 | **Creative Exploration** | Parallel implementations | <ul><li>Explore diverse solutions</li><li>Support multiple technology stacks & architectures</li><li>Experiment with UX patterns</li></ul> |
 | **Iterative Enhancement** ("Brownfield") | Brownfield modernization | <ul><li>Add features iteratively</li><li>Modernize legacy systems</li><li>Adapt processes</li></ul> |
 
-## 🎯 Experimental Goals
+## 🎯 Experimental goals
 
 Our research and experimentation focus on:
 
-### Technology Independence
+### Technology independence
 
 - Create applications using diverse technology stacks
 - Validate the hypothesis that SDD is a process not tied to specific technologies, programming languages, or frameworks
 
-### Enterprise Constraints
+### Enterprise constraints
 
 - Demonstrate mission-critical application development
 - Incorporate organizational constraints (cloud providers, tech stacks, engineering practices)
 - Support enterprise design systems and compliance requirements
 
-### User-Centric Development
+### User-centric development
 
 - Build applications for different user cohorts and preferences
 - Support various development approaches (from vibe-coding to AI-native development)
 
-### Creative & Iterative Processes
+### Creative & iterative processes
 
 - Validate the concept of parallel implementation exploration
 - Provide robust iterative feature development workflows
@@ -87,12 +87,14 @@ To use this repository effectively:
       - [Claude Code](https://www.anthropic.com/claude-code)
       - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - [uv](https://docs.astral.sh/uv/) - we use this instead of `pip` for package management
-- [Python 3.12](https://www.python.org/downloads/) at least
+- [Python 3.11](https://www.python.org/downloads/) at least
+- [Git](https://git-scm.com/downloads)
+- [GitHub CLI](https://cli.github.com/)
 
 >[!NOTE]
 >While the repository uses Claude Code conventions, the pattern is applicable to _any_ modern agentic AI tool. You might need to make certain tweaks to get it to work properly.
 
-## 🚀 Quick Start
+## 🚀 Quickstart
 
 ### Understanding the methodology
 
@@ -100,6 +102,30 @@ Start by reading the core documents to familiarize yourself with the principles:
 
 1. [**`sdd.md`**](./sdd.md) - The complete SDD methodology.
 2. [**`specify-proposal.md`**](./specify-proposal.md) - Vision for tooling to support SDD.
+
+### Before using the CLI
+
+You will need to make sure that you have both `git` and `gh` installed on your machine.
+
+With `git` installed, make sure that you are logged in with your GitHub account. The easiest way to do that is with the help of [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) (GCM). If you are using Linux, after installing GCM you will need to make sure that you set it as your credential helper:
+
+```bash
+git-credential-manager configure
+git config --global credential.helper manager
+```
+
+You will also need to make sure that the Git settings are correctly configured for your users for the CLI to properly set up the Git project:
+
+```bash
+git config --global user.name "Test User"
+git config --global user.email "you@example.com"
+```
+
+You will also need to make sure that you log in with the GitHub CLI:
+
+```bash
+gh auth login
+```
 
 ### Using the CLI
 
@@ -142,6 +168,12 @@ specify init <project_name> --ai claude --ignore-agent-tools
 ```
 
 ### STEP 1: Bootstrap the project
+
+Go to the project folder and run your AI agent. In our example, we're using `claude`.
+
+![Bootstrapping Claude Code environment](./media/bootstrap-claude-code.gif)
+
+You will know that things are configured correctly if you see the `/specify`, `/plan`, and `/tasks` commands available.
 
 The first step should be creating a new project scaffolding. Use `/specify` command and then provide the concrete requirements for the project you want to develop.
 
