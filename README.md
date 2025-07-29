@@ -1,6 +1,6 @@
 <div align="center">
     <img src="./media/logo_small.webp"/>
-    <h1>🚀 Specification-Driven Development (SDD)</h1>
+    <h1>🌱 Specification-Driven Development (SDD)</h1>
     <h3><em>Transforming intent into reality</em></h3>
 </div>
 
@@ -15,12 +15,12 @@
 
 ## Table of Contents
 
-- [🎯 What is SDD?](#-what-is-sdd)
+- [🤔 What is SDD?](#-what-is-sdd)
 - [📚 Core Philosophy](#-core-philosophy)
 - [🌟 Development Phases](#-development-phases)
 - [🎯 Experimental Goals](#-experimental-goals)
 - [🔧 Prerequisites](#-prerequisites)
-- [ Quick Start](#-quick-start)
+- [🚀 Quickstart](#-quick-start)
   - [Understanding the methodology](#understanding-the-methodology)
   - [Using the CLI](#using-the-cli)
   - [STEP 0: Initialize your project](#step-0-initialize-your-project)
@@ -30,7 +30,7 @@
   - [STEP 4: Have Claude Code validate the plan](#step-4-have-claude-code-validate-the-plan)
   - [STEP 5: Implementation](#step-5-implementation)
 
-## 🎯 What is SDD?
+## 🤔 What is SDD?
 
 Specification-Driven Development (SDD) **flips the script** on traditional software development. For decades, code has been king — specifications were just scaffolding we built and discarded once the "real work" of coding began. SDD changes this: **specifications become executable**, directly generating working implementations rather than just guiding them.
 
