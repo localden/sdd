@@ -143,7 +143,7 @@ uvx --from git+https://github.com/localden/sdd.git specify init <PROJECT_NAME>
 uv tool install git+https://github.com/localden/sdd.git
 ```
 
-### STEP 0: Initialize your project
+### **STEP 0:** Initialize your project
 
 You can use the Specify CLI to bootstrap your project, which will bring in the required artifacts in your environment. Run:
 
@@ -167,7 +167,7 @@ The CLI will check if you have Claude Code or Gemini CLI installed. If you do no
 specify init <project_name> --ai claude --ignore-agent-tools
 ```
 
-### STEP 1: Bootstrap the project
+### **STEP 1:** Bootstrap the project
 
 Go to the project folder and run your AI agent. In our example, we're using `claude`.
 
@@ -201,15 +201,39 @@ see yours. You can edit any comments that you make, but you can't edit comments 
 delete any comments that you made, but you can't delete comments anybody else made.
 ```
 
-After this prompt is entered, you should see Claude Code kick off the planning and spec drafting process.
+After this prompt is entered, you should see Claude Code kick off the planning and spec drafting process. Claude Code will also trigger some of the built-in scripts to set up the repository.
 
 Once this step is completed, you should have a new branch created (e.g., `001-create-taskify`), as well as a new specification in the `specs/001-create-taskify` directory.
 
-The produced specification should contain a set of user stories and functional requirements.
+The produced specification should contain a set of user stories and functional requirements, as defined in the template.
 
-### STEP 2: Functional specification clarification
+At this stage, your project folder contents should resemble the following:
 
-With the baseline specification now created, you can go ahead and clarify any of the requirements that were not captured properly within the first shot attempt. For example, a prompt could be this:
+```text
+├── memory
+│		 ├── constitution.md
+│		 └── constitution_update_checklist.md
+├── scripts
+│		 ├── check-task-prerequisites.sh
+│		 ├── common.sh
+│		 ├── create-new-feature.sh
+│		 ├── get-feature-paths.sh
+│		 ├── setup-plan.sh
+│		 └── update-claude-md.sh
+├── specs
+│		 └── 002-create-taskify
+│		     └── spec.md
+└── templates
+    ├── CLAUDE-template.md
+    ├── plan-template.md
+    ├── spec-template.md
+    ├── tasks-template.md
+    └── worktree-setup.sh
+```
+
+### **STEP 2:** Functional specification clarification
+
+With the baseline specification created, you can go ahead and clarify any of the requirements that were not captured properly within the first shot attempt. For example, you could use a prompt like this within the same Claude Code session:
 
 ```text
 For each sample project or project that you create there should be a variable number of tasks between 5 and 15
@@ -223,13 +247,15 @@ You should also ask Claude Code to validate the **Review & Acceptance Checklist*
 Read the review and acceptance checklist, and check off each item in the checklist if the feature spec meets the criteria. Leave it empty if it does not.
 ```
 
-### STEP 3: Generate a plan
+It's important to use the interaction with Claude Code as an opportunity to clarify and ask questions around the specification - **do not treat its first attempt as final**.
 
-You can now be specific about the tech stack and other technical requirements. You can use the `/generate_plan` command that is built into this repository, with the following prompt:
+### **STEP 3:** Generate a plan
+
+You can now be specific about the tech stack and other technical requirements. You can use the `/plan` command that is built into the project template with a prompt like this:
 
 ```text
 We are going to generate this using .NET Aspire, using Postgres as the database. The frontend should use
-Blazor server with drag-and-drop task boards, real-time updates. There shoul dbe a REST API created with a projects API,
+Blazor server with drag-and-drop task boards, real-time updates. There should be a REST API created with a projects API,
 tasks API, and a notifications API.
 ```
 
@@ -237,38 +263,36 @@ The output of this step will include a number of implementation detail documents
 
 ```text
 .
-├── base
-│	├── CLAUDE.md
-│	├── memory
-│	│	└── constitution.md
-│	└── templates
-│	    ├── feature-spec-template.md
-│	    └── implementation-plan-template.md
-├── gen.sh
-├── media
-│	├── claude-code-starter.gif
-│	└── generate-plan.gif
-├── README.md
-├── sdd.md
-├── specify-proposal.md
-└── specs
-    └── 001-create-taskify
-        ├── feature-spec.md
-        ├── implementation-details
-        │		 ├── 00-research.md
-        │		 ├── 01-environment-setup.md
-        │		 ├── 02-data-model.md
-        │		 ├── 03-api-contracts.md
-        │		 ├── 04-algorithms.md
-        │		 ├── 05-integrations.md
-        │		 ├── 06-contract-tests.md
-        │		 ├── 07-integration-tests.md
-        │		 └── 08-inter-library-tests.md
-        ├── implementation-plan.md
-        └── manual-testing.md
-```
+├── CLAUDE.md
+├── memory
+│		 ├── constitution.md
+│		 └── constitution_update_checklist.md
+├── scripts
+│		 ├── check-task-prerequisites.sh
+│		 ├── common.sh
+│		 ├── create-new-feature.sh
+│		 ├── get-feature-paths.sh
+│		 ├── setup-plan.sh
+│		 └── update-claude-md.sh
+├── specs
+│		 └── 002-create-taskify
+│		     ├── contracts
+│		     │		 ├── api-spec.json
+│		     │		 └── signalr-spec.md
+│		     ├── data-model.md
+│		     ├── plan.md
+│		     ├── quickstart.md
+│		     ├── research.md
+│		     └── spec.md
+└── templates
+    ├── CLAUDE-template.md
+    ├── plan-template.md
+    ├── spec-template.md
+    ├── tasks-template.md
+    └── worktree-setup.sh
 
-Check the `00-research.md` document to ensure that the right tech stack is used, based on your instructions. You can ask Claude Code to refine it if any of the components stand out, or even have it check the locally-installed version of the platform/framework you want to use (e.g., .NET).
+
+Check the `research.md` document to ensure that the right tech stack is used, based on your instructions. You can ask Claude Code to refine it if any of the components stand out, or even have it check the locally-installed version of the platform/framework you want to use (e.g., .NET).
 
 Additionally, you might want to ask Claude Code to research details about the chosen tech stack if it's something that is rapidly changing (e.g., .NET Aspire, JS frameworks), with a prompt like this:
 
@@ -295,7 +319,7 @@ That's way too untargeted research. The research needs to help you solve a speci
 >[!NOTE]
 >Claude Code might be over-eager and add components that you did not ask for. Ask it to clarify the rationale and the source of the change.
 
-### STEP 4: Have Claude Code validate the plan
+### **STEP 4:** Have Claude Code validate the plan
 
 With the plan in place, you should have Claude Code run through it to make sure that there are no missing pieces. You can use a prompt like this:
 
@@ -319,7 +343,7 @@ You can also ask Claude Code (if you have the [GitHub CLI](https://docs.github.c
 Once ready, instruct Claude Code to implement your solution (example path included):
 
 ```text
-implement specs/002-taskify-kanban/implementation-plan.md
+implement specs/002-taskify-kanban/plan.md
 ```
 
 Claude Code will spring into action and will start creating the implementation.
