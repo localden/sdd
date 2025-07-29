@@ -290,7 +290,7 @@ The output of this step will include a number of implementation detail documents
     ├── spec-template.md
     ├── tasks-template.md
     └── worktree-setup.sh
-
+```
 
 Check the `research.md` document to ensure that the right tech stack is used, based on your instructions. You can ask Claude Code to refine it if any of the components stand out, or even have it check the locally-installed version of the platform/framework you want to use (e.g., .NET).
 
