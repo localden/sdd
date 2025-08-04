@@ -106,6 +106,12 @@ jobs:
         if [ -d "agent_templates/copilot" ]; then
           mkdir -p sdd-copilot-package/.github
           cp -r agent_templates/copilot/* sdd-copilot-package/.github/
+          
+          # Move prompts folder to .github/prompts as expected by Copilot
+          if [ -d "sdd-copilot-package/.github/prompts" ]; then
+            echo "Moved prompts to .github/prompts for Copilot"
+          fi
+          
           echo "Created GitHub Copilot package"
         fi
         
