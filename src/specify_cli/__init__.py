@@ -296,91 +296,92 @@ def init_git_repo(project_path: Path) -> bool:
 def download_and_extract_template(project_name: str, ai_assistant: str) -> Path:
     """Download the latest release and extract it to create a new project."""
     project_path = Path(project_name).resolve()
-    
-    # Note: Directory existence is already checked in the init command
+    current_dir = Path.cwd()
     
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
-        # Create temporary directory for download
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
-            
-            # Download latest release template using gh CLI
-            task = progress.add_task("Downloading latest template...", total=None)
-            try:
-                # Use gh to download the specific AI assistant template ZIP file
-                pattern = f"sdd-template-{ai_assistant}-*.zip"
-                run_command([
-                    "gh", "release", "download", 
-                    "--repo", "localden/sdd",
-                    "--pattern", pattern,
-                    "--dir", str(temp_path)
-                ])
-            except subprocess.CalledProcessError as e:
-                console.print(f"[red]Error downloading template:[/red] {e}")
-                raise typer.Exit(1)
-            progress.update(task, completed=True)
-            
-            # Find the downloaded template ZIP file
+        # Download latest release template using gh CLI to current directory
+        task = progress.add_task("Downloading latest template...", total=None)
+        try:
             pattern = f"sdd-template-{ai_assistant}-*.zip"
-            template_files = list(temp_path.glob(pattern))
-            if not template_files:
-                console.print("[red]Error:[/red] No template ZIP file found after download")
-                console.print(f"[yellow]Looking for files matching pattern: {pattern}[/yellow]")
-                console.print(f"[yellow]Files found in {temp_path}:[/yellow]")
-                for file in temp_path.iterdir():
+            console.print(f"[cyan]Downloading pattern:[/cyan] {pattern}")
+            
+            run_command([
+                "gh", "release", "download", 
+                "--repo", "localden/sdd",
+                "--pattern", pattern
+            ])
+        except subprocess.CalledProcessError as e:
+            console.print(f"[red]Error downloading template:[/red] {e}")
+            raise typer.Exit(1)
+        progress.update(task, completed=True)
+        
+        # Find the downloaded template ZIP file in current directory
+        template_files = list(current_dir.glob(pattern))
+        if not template_files:
+            console.print("[red]Error:[/red] No template ZIP file found after download")
+            console.print(f"[yellow]Looking for files matching pattern: {pattern}[/yellow]")
+            console.print(f"[yellow]Files in current directory:[/yellow]")
+            for file in current_dir.iterdir():
+                if file.is_file() and file.suffix == '.zip':
                     console.print(f"  - {file.name}")
-                raise typer.Exit(1)
+            raise typer.Exit(1)
+        
+        zip_path = template_files[0]
+        console.print(f"[cyan]Downloaded:[/cyan] {zip_path.name}")
+        console.print(f"[cyan]Size:[/cyan] {zip_path.stat().st_size:,} bytes")
+        
+        # Extract ZIP file
+        task = progress.add_task("Extracting template...", total=None)
+        try:
+            # Create project directory
+            project_path.mkdir(parents=True)
             
-            zip_path = template_files[0]
-            console.print(f"[cyan]Downloaded:[/cyan] {zip_path.name}")
-            console.print(f"[cyan]Size:[/cyan] {zip_path.stat().st_size:,} bytes")
-            
-            # Extract ZIP file
-            task = progress.add_task("Extracting template...", total=None)
-            try:
-                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                    # List all files in the ZIP for debugging
-                    zip_contents = zip_ref.namelist()
-                    console.print(f"[cyan]ZIP contains {len(zip_contents)} items[/cyan]")
-                    
-                    # Extract to temporary directory first
-                    extract_dir = temp_path / "extracted"
-                    zip_ref.extractall(extract_dir)
-                    
-                    # Check what was extracted
-                    extracted_items = list(extract_dir.iterdir())
-                    console.print(f"[cyan]Extracted {len(extracted_items)} items:[/cyan]")
-                    for item in extracted_items:
-                        console.print(f"  - {item.name} ({'dir' if item.is_dir() else 'file'})")
-                    
-                    # Handle different ZIP structures
-                    if len(extracted_items) == 1 and extracted_items[0].is_dir():
-                        # GitHub-style ZIP with a single root directory
-                        extracted_source = extracted_items[0]
-                    elif len(extracted_items) > 0:
-                        # Our release ZIP with direct contents
-                        extracted_source = extract_dir
-                    else:
-                        console.print("[red]Error:[/red] ZIP file appears to be empty")
-                        raise typer.Exit(1)
-                    
-                    # Move contents to project directory
-                    project_path.mkdir(parents=True)
-                    for item in extracted_source.iterdir():
-                        if item.is_dir():
-                            shutil.copytree(item, project_path / item.name)
-                        else:
-                            shutil.copy2(item, project_path / item.name)
-                            
-            except Exception as e:
-                console.print(f"[red]Error extracting template:[/red] {e}")
-                raise typer.Exit(1)
+            with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                # List all files in the ZIP for debugging
+                zip_contents = zip_ref.namelist()
+                console.print(f"[cyan]ZIP contains {len(zip_contents)} items[/cyan]")
                 
-            progress.update(task, completed=True)
+                # Extract directly to project directory
+                zip_ref.extractall(project_path)
+                
+                # Check what was extracted
+                extracted_items = list(project_path.iterdir())
+                console.print(f"[cyan]Extracted {len(extracted_items)} items to {project_path}:[/cyan]")
+                for item in extracted_items:
+                    console.print(f"  - {item.name} ({'dir' if item.is_dir() else 'file'})")
+                
+                # Handle GitHub-style ZIP with a single root directory
+                if len(extracted_items) == 1 and extracted_items[0].is_dir():
+                    # Move contents up one level
+                    nested_dir = extracted_items[0]
+                    temp_move_dir = project_path.parent / f"{project_path.name}_temp"
+                    
+                    # Move the nested directory contents to temp location
+                    shutil.move(str(nested_dir), str(temp_move_dir))
+                    # Remove the now-empty project directory
+                    project_path.rmdir()
+                    # Rename temp directory to project directory
+                    shutil.move(str(temp_move_dir), str(project_path))
+                    
+                    console.print(f"[cyan]Flattened nested directory structure[/cyan]")
+                    
+        except Exception as e:
+            console.print(f"[red]Error extracting template:[/red] {e}")
+            # Clean up project directory if created
+            if project_path.exists():
+                shutil.rmtree(project_path)
+            raise typer.Exit(1)
+        finally:
+            # Clean up downloaded ZIP file
+            if zip_path.exists():
+                zip_path.unlink()
+                console.print(f"[cyan]Cleaned up:[/cyan] {zip_path.name}")
+                
+        progress.update(task, completed=True)
     
     return project_path
 
