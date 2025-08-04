@@ -108,10 +108,15 @@ Start by reading the core documents to familiarize yourself with the principles:
 
 You will need to make sure that you have both `git` and `gh` installed on your machine.
 
-With `git` installed, make sure that you are logged in with your GitHub account. The easiest way to do that is with the help of [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) (GCM). If you are using Linux, after installing GCM you will need to make sure that you set it as your credential helper:
+With `git` installed, make sure that you are logged in with your GitHub account. The easiest way to do that is with the help of [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) (GCM).
+
+You can [refer to the appendix](#appendix-a-installing-gcm-on-debian-based-linux-os) to learn about how to one-script install GCM on Debian-based Linux distributions.
+
+If you are using Linux, after installing GCM you will need to make sure that you set it as your credential helper:
 
 ```bash
 git-credential-manager configure
+git config --global --unset-all credential.helper
 git config --global credential.helper manager
 ```
 
@@ -353,3 +358,28 @@ Claude Code will spring into action and will start creating the implementation.
 >Claude Code will execute local CLI commands (such as `dotnet`) - make sure you have them installed on your machine.
 
 Once the implementation step is done, ask Claude Code to try to run the application and resolve any emerging build errors. If the application runs, but there are _runtime errors_ that are not directly available to Claude Code through CLI logs (e.g., errors rendered in browser logs), copy and paste the error in Claude Code and have it attempt to resolve it.
+
+## Appendix
+
+### Appendix A: Installing GCM on Debian-based Linux OS
+
+```bash
+#!/bin/bash
+
+set -e
+
+echo "Downloading Git Credential Manager v2.6.1..."
+wget https://github.com/git-ecosystem/git-credential-manager/releases/download/v2.6.1/gcm-linux_amd64.2.6.1.deb
+
+echo "Installing Git Credential Manager..."
+sudo dpkg -i gcm-linux_amd64.2.6.1.deb
+
+echo "Configuring Git to use GCM..."
+git config --global credential.helper manager
+
+echo "Cleaning up..."
+rm gcm-linux_amd64.2.6.1.deb
+
+echo "Git Credential Manager installed successfully!"
+echo "You can now use 'git credential-manager' commands."
+```
