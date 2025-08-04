@@ -16,7 +16,7 @@
    → Update Progress Tracking: Initial Constitution Check
 4. Execute Phase 0 → research.md
    → If NEEDS CLARIFICATION remain: ERROR "Resolve unknowns"
-5. Execute Phase 1 → contracts, data-model.md, quickstart.md, CLAUDE.md
+5. Execute Phase 1 → contracts, data-model.md, quickstart.md, agent-specific template file (e.g., `CLAUDE.md` for Claude Code, `.github/copilot-instructions.md` for GitHub Copilot, or `GEMINI.md` for Gemini CLI).
 6. Re-evaluate Constitution Check section
    → If new violations: Refactor design, return to Phase 1
    → Update Progress Tracking: Post-Design Constitution Check
@@ -170,16 +170,19 @@ ios/ or android/
    - Each story → integration test scenario
    - Quickstart test = story validation steps
 
-5. **Update CLAUDE.md incrementally** (O(1) operation):
+5. **Update agent file incrementally** (O(1) operation):
    - Run `/scripts/update-claude-md.sh`
-   - If no CLAUDE.md exists: Create from template
+   - If no agent file exists: Create from template (`agent-file-template.md`) and name it according to the agent used:
+      - `CLAUDE.md` for Claude Code.
+      - `.github/copilot-instructions.md` for GitHub Copilot.
+      - `GEMINI.md` for Gemini CLI.
    - If exists: Add only NEW tech from current plan
    - Preserve manual additions between markers
    - Update recent changes (keep last 3)
    - Keep under 150 lines for token efficiency
    - Output to repository root
 
-**Output**: data-model.md, /contracts/*, failing tests, quickstart.md, CLAUDE.md
+**Output**: data-model.md, /contracts/*, failing tests, quickstart.md, agent-specific file
 
 ## Phase 2: Task Planning Approach
 *This section describes what the /tasks command will do - DO NOT execute during /plan*

@@ -1,4 +1,7 @@
-# Task breakdown prompt
+---
+name: tasks
+description: "Break down the plan into executable tasks. This is the third step in the Spec-Driven Development lifecycle."
+---
 
 Break down the plan into executable tasks.
 
@@ -68,5 +71,7 @@ Given the context provided as an argument, I need you to:
    - Clear file paths for each task
    - Dependency notes
    - Parallel execution guidance
+
+Context for task generation: {ARGS}
 
 The tasks.md should be immediately executable - each task should be specific enough that an LLM can complete it without additional context.

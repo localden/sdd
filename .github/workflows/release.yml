@@ -74,46 +74,69 @@ jobs:
           echo "Copied templates folder"
         fi
         
+        # Generate command files for each agent from source templates
+        generate_commands() {
+          local agent=$1
+          local ext=$2
+          local arg_format=$3
+          local output_dir=$4
+          
+          mkdir -p "$output_dir"
+          
+          for template in templates/commands/*.md; do
+            if [[ -f "$template" ]]; then
+              name=$(basename "$template" .md)
+              description=$(awk '/^description:/ {gsub(/^description: *"?/, ""); gsub(/"$/, ""); print; exit}' "$template" | tr -d '\r')
+              content=$(awk '/^---$/{if(++count==2) start=1; next} start' "$template" | sed "s/{ARGS}/$arg_format/g")
+              
+              case $ext in
+                "toml")
+                  {
+                    echo "description = \"$description\""
+                    echo ""
+                    echo "prompt = \"\"\""
+                    echo "$content"
+                    echo "\"\"\""
+                  } > "$output_dir/$name.$ext"
+                  ;;
+                "md")
+                  echo "$content" > "$output_dir/$name.$ext"
+                  ;;
+                "prompt.md")
+                  {
+                    echo "# $(echo "$description" | sed 's/\. .*//')"
+                    echo ""
+                    echo "$content"
+                  } > "$output_dir/$name.$ext"
+                  ;;
+              esac
+            fi
+          done
+        }
+        
         # Create Claude Code package
         mkdir -p sdd-claude-package
         cp -r sdd-package-base/* sdd-claude-package/
-        if [ -d "agent_templates/claude" ]; then
-          cp -r agent_templates/claude sdd-claude-package/.claude
-          echo "Created Claude Code package"
-        fi
+        mkdir -p sdd-claude-package/.claude/commands
+        generate_commands "claude" "md" "\$ARGUMENTS" "sdd-claude-package/.claude/commands"
+        echo "Created Claude Code package"
         
-        # Create Gemini CLI package
+        # Create Gemini CLI package  
         mkdir -p sdd-gemini-package
         cp -r sdd-package-base/* sdd-gemini-package/
-        if [ -d "agent_templates/gemini" ]; then
-          cp -r agent_templates/gemini sdd-gemini-package/.gemini
-          # Move GEMINI.md to root for easier access
-          if [ -f "sdd-gemini-package/.gemini/GEMINI.md" ]; then
-            mv sdd-gemini-package/.gemini/GEMINI.md sdd-gemini-package/GEMINI.md
-            echo "Moved GEMINI.md to root of Gemini package"
-          fi
-          # Remove empty .gemini folder if it only contained GEMINI.md
-          if [ -d "sdd-gemini-package/.gemini" ] && [ -z "$(find sdd-gemini-package/.gemini -type f)" ]; then
-            rm -rf sdd-gemini-package/.gemini
-            echo "Removed empty .gemini folder"
-          fi
-          echo "Created Gemini CLI package"
+        mkdir -p sdd-gemini-package/.gemini/commands
+        generate_commands "gemini" "toml" "{{args}}" "sdd-gemini-package/.gemini/commands"
+        if [ -f "agent_templates/gemini/GEMINI.md" ]; then
+          cp agent_templates/gemini/GEMINI.md sdd-gemini-package/GEMINI.md
         fi
+        echo "Created Gemini CLI package"
         
         # Create GitHub Copilot package
         mkdir -p sdd-copilot-package
         cp -r sdd-package-base/* sdd-copilot-package/
-        if [ -d "agent_templates/copilot" ]; then
-          mkdir -p sdd-copilot-package/.github
-          cp -r agent_templates/copilot/* sdd-copilot-package/.github/
-          
-          # Move prompts folder to .github/prompts as expected by Copilot
-          if [ -d "sdd-copilot-package/.github/prompts" ]; then
-            echo "Moved prompts to .github/prompts for Copilot"
-          fi
-          
-          echo "Created GitHub Copilot package"
-        fi
+        mkdir -p sdd-copilot-package/.github/prompts
+        generate_commands "copilot" "prompt.md" "\$ARGUMENTS" "sdd-copilot-package/.github/prompts"
+        echo "Created GitHub Copilot package"
         
         # Create archive files for each package
         cd sdd-claude-package && zip -r ../sdd-template-claude-${{ steps.get_tag.outputs.new_version }}.zip . && cd ..

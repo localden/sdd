@@ -1,4 +1,7 @@
-# Planning prompt
+---
+name: plan
+description: "Plan how to implement the specified feature. This is the second step in the Spec-Driven Development lifecycle."
+---
 
 Plan how to implement the specified feature.
 
@@ -33,7 +36,7 @@ Given the implementation details provided as an argument, I need you to:
      * Phase 0 generates research.md
      * Phase 1 generates data-model.md, contracts/, quickstart.md
      * Phase 2 generates tasks.md
-   - Incorporate user-provided details from arguments into Technical Context
+   - Incorporate user-provided details from arguments into Technical Context: {ARGS}
    - Update Progress Tracking as you complete each phase
 
 5. Verify execution completed:
