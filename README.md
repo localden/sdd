@@ -90,6 +90,7 @@ To use this repository effectively:
 - [uv](https://docs.astral.sh/uv/) - we use this instead of `pip` for package management
 - [Python 3.11](https://www.python.org/downloads/) at least
 - [Git](https://git-scm.com/downloads)
+- Internet connection for downloading templates
 
 ## 🚀 Quickstart
 
@@ -102,9 +103,7 @@ Start by reading the core documents to familiarize yourself with the principles:
 
 ### Before using the CLI
 
-You will need to make sure that you have both `git` and `gh` installed on your machine.
-
-With `git` installed, make sure that you are logged in with your GitHub account. The easiest way to do that is with the help of [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) (GCM).
+You will need to make sure that you have `git` installed on your machine and that you are logged in with your GitHub account. The easiest way to do that is with the help of [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) (GCM).
 
 You can [refer to the appendix](#appendix-a-installing-gcm-on-debian-based-linux-os) to learn about how to one-script install GCM on Debian-based Linux distributions.
 
@@ -147,6 +146,12 @@ You can use the Specify CLI to bootstrap your project, which will bring in the r
 specify init <project_name>
 ```
 
+Or initialize in the current directory:
+
+```bash
+specify init --here
+```
+
 ![Specify CLI bootstrapping a new project in the terminal](./media/specify_cli.gif)
 
 You will be prompted to select the AI agent you are using. You can also proactively specify it directly in the terminal:
@@ -155,6 +160,8 @@ You will be prompted to select the AI agent you are using. You can also proactiv
 specify init <project_name> --ai claude
 specify init <project_name> --ai gemini
 specify init <project_name> --ai copilot
+# Or in current directory:
+specify init --here --ai claude
 ```
 
 The CLI will check if you have Claude Code or Gemini CLI installed. If you do not, or you prefer to get the templates without checking for the right tools, use `--ignore-agent-tools` with your command:

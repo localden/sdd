@@ -6,7 +6,7 @@
 #     "rich",
 #     "platformdirs",
 #     "readchar",
-#     "requests",
+#     "httpx",
 # ]
 # ///
 """
@@ -33,7 +33,7 @@ from pathlib import Path
 from typing import Optional
 
 import typer
-import requests
+import httpx
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -304,10 +304,10 @@ def download_template_from_github(ai_assistant: str, download_dir: Path) -> Path
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
     
     try:
-        response = requests.get(api_url, timeout=30)
+        response = httpx.get(api_url, timeout=30)
         response.raise_for_status()
         release_data = response.json()
-    except requests.RequestException as e:
+    except httpx.RequestError as e:
         console.print(f"[red]Error fetching release information:[/red] {e}")
         raise typer.Exit(1)
     
@@ -340,14 +340,14 @@ def download_template_from_github(ai_assistant: str, download_dir: Path) -> Path
     console.print(f"[cyan]Downloading template...[/cyan]")
     
     try:
-        with requests.get(download_url, stream=True, timeout=30) as response:
+        with httpx.stream("GET", download_url, timeout=30) as response:
             response.raise_for_status()
             total_size = int(response.headers.get('content-length', 0))
             
             with open(zip_path, 'wb') as f:
                 if total_size == 0:
                     # No content-length header, download without progress
-                    for chunk in response.iter_content(chunk_size=8192):
+                    for chunk in response.iter_bytes(chunk_size=8192):
                         f.write(chunk)
                 else:
                     # Show progress bar
@@ -359,12 +359,12 @@ def download_template_from_github(ai_assistant: str, download_dir: Path) -> Path
                     ) as progress:
                         task = progress.add_task("Downloading...", total=total_size)
                         downloaded = 0
-                        for chunk in response.iter_content(chunk_size=8192):
+                        for chunk in response.iter_bytes(chunk_size=8192):
                             f.write(chunk)
                             downloaded += len(chunk)
                             progress.update(task, completed=downloaded)
     
-    except requests.RequestException as e:
+    except httpx.RequestError as e:
         console.print(f"[red]Error downloading template:[/red] {e}")
         if zip_path.exists():
             zip_path.unlink()
@@ -676,9 +676,9 @@ def check():
     # Check if we have internet connectivity by trying to reach GitHub API
     console.print("[cyan]Checking internet connectivity...[/cyan]")
     try:
-        response = requests.get("https://api.github.com", timeout=5)
+        response = httpx.get("https://api.github.com", timeout=5)
         console.print("[green]✓[/green] Internet connection available")
-    except requests.RequestException:
+    except httpx.RequestError:
         console.print("[red]✗[/red] No internet connection - required for downloading templates")
         console.print("[yellow]Please check your internet connection[/yellow]")
     
