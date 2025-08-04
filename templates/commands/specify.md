@@ -12,9 +12,20 @@ Given the feature description provided as an argument, I need you to:
 1. **First, run the feature creation script** to create the branch and spec file:
    ```bash
    REPO_ROOT=$(git rev-parse --show-toplevel)
-   OUTPUT=$($REPO_ROOT/scripts/create-new-feature.sh "{ARGS}")
-   BRANCH_NAME=$(echo "$OUTPUT" | grep "BRANCH_NAME:" | cut -d' ' -f2)
-   SPEC_FILE=$(echo "$OUTPUT" | grep "SPEC_FILE:" | cut -d' ' -f2)
+   OUTPUT=$($REPO_ROOT/scripts/create-new-feature.sh "{ARGS}" 2>&1)
+   
+   # Verify the script succeeded by checking for required outputs
+   if [[ $OUTPUT == *"BRANCH_NAME:"* && $OUTPUT == *"SPEC_FILE:"* ]]; then
+       echo "✅ Feature creation successful!"
+       BRANCH_NAME=$(echo "$OUTPUT" | grep "BRANCH_NAME:" | cut -d' ' -f2)
+       SPEC_FILE=$(echo "$OUTPUT" | grep "SPEC_FILE:" | cut -d' ' -f2)
+       echo "Branch: $BRANCH_NAME"
+       echo "Spec file: $SPEC_FILE"
+   else
+       echo "❌ Feature creation failed. Output:"
+       echo "$OUTPUT"
+       exit 1
+   fi
    ```
 
 2. **Then, read the spec template** to understand the structure:
@@ -27,7 +38,13 @@ Given the feature description provided as an argument, I need you to:
    - Replace placeholders with appropriate content based on the feature description
    - Write directly to the spec file created in step 1
 
-4. **Confirm creation** with branch name and file path
+4. **Confirm creation** with branch name and file path:
+   ```bash
+   echo "🎉 SPECIFICATION COMPLETE! 🎉"
+   echo "✅ Branch created: $BRANCH_NAME"
+   echo "✅ Specification file: $SPEC_FILE"
+   echo "✅ Ready for development phase"
+   ```
 
 Use absolute paths with the repository root for all file operations to avoid path issues.
 
