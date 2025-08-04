@@ -90,10 +90,6 @@ To use this repository effectively:
 - [uv](https://docs.astral.sh/uv/) - we use this instead of `pip` for package management
 - [Python 3.11](https://www.python.org/downloads/) at least
 - [Git](https://git-scm.com/downloads)
-- [GitHub CLI](https://cli.github.com/)
-
->[!NOTE]
->While the repository uses Claude Code conventions, the pattern is applicable to _any_ modern agentic AI tool. You might need to make certain tweaks to get it to work properly.
 
 ## 🚀 Quickstart
 
@@ -125,12 +121,6 @@ You will also need to make sure that the Git settings are correctly configured f
 ```bash
 git config --global user.name "Test User"
 git config --global user.email "you@example.com"
-```
-
-You will also need to make sure that you log in with the GitHub CLI:
-
-```bash
-gh auth login
 ```
 
 ### Using the CLI
