@@ -171,11 +171,7 @@ ios/ or android/
    - Quickstart test = story validation steps
 
 5. **Update agent file incrementally** (O(1) operation):
-   - Run `/scripts/update-claude-md.sh`
-   - If no agent file exists: Create from template (`agent-file-template.md`) and name it according to the agent used:
-      - `CLAUDE.md` for Claude Code.
-      - `.github/copilot-instructions.md` for GitHub Copilot.
-      - `GEMINI.md` for Gemini CLI.
+   - Run `/scripts/update-agent-context.sh [claude|gemini|copilot]` for your AI assistant
    - If exists: Add only NEW tech from current plan
    - Preserve manual additions between markers
    - Update recent changes (keep last 3)
