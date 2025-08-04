@@ -6,6 +6,7 @@
 #     "rich",
 #     "platformdirs",
 #     "readchar",
+#     "requests",
 # ]
 # ///
 """
@@ -13,10 +14,12 @@ Specify CLI - Setup tool for Specify projects
 
 Usage:
     uvx specify-cli.py init <project-name>
+    uvx specify-cli.py init --here
     
 Or install globally:
     uv tool install --from specify-cli.py specify-cli
     specify init <project-name>
+    specify init --here
 """
 
 import os
@@ -25,10 +28,12 @@ import sys
 import zipfile
 import tempfile
 import shutil
+import json
 from pathlib import Path
 from typing import Optional
 
 import typer
+import requests
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -47,10 +52,6 @@ AI_CHOICES = {
     "gemini": "Gemini CLI", 
     "copilot": "GitHub Copilot"
 }
-
-CRITICAL_TOOLS = [
-    ("gh", "https://cli.github.com/")
-]
 
 # ASCII Art Banner
 BANNER = """
@@ -293,9 +294,88 @@ def init_git_repo(project_path: Path) -> bool:
         os.chdir(original_cwd)
 
 
-def download_and_extract_template(project_name: str, ai_assistant: str) -> Path:
+def download_template_from_github(ai_assistant: str, download_dir: Path) -> Path:
+    """Download the latest template release from GitHub using HTTP requests."""
+    repo_owner = "localden"
+    repo_name = "sdd"
+    
+    # Get the latest release information
+    console.print("[cyan]Fetching latest release information...[/cyan]")
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
+    
+    try:
+        response = requests.get(api_url, timeout=30)
+        response.raise_for_status()
+        release_data = response.json()
+    except requests.RequestException as e:
+        console.print(f"[red]Error fetching release information:[/red] {e}")
+        raise typer.Exit(1)
+    
+    # Find the template asset for the specified AI assistant
+    pattern = f"sdd-template-{ai_assistant}"
+    matching_assets = [
+        asset for asset in release_data.get("assets", [])
+        if pattern in asset["name"] and asset["name"].endswith(".zip")
+    ]
+    
+    if not matching_assets:
+        console.print(f"[red]Error:[/red] No template found for AI assistant '{ai_assistant}'")
+        console.print(f"[yellow]Available assets:[/yellow]")
+        for asset in release_data.get("assets", []):
+            console.print(f"  - {asset['name']}")
+        raise typer.Exit(1)
+    
+    # Use the first matching asset
+    asset = matching_assets[0]
+    download_url = asset["browser_download_url"]
+    filename = asset["name"]
+    file_size = asset["size"]
+    
+    console.print(f"[cyan]Found template:[/cyan] {filename}")
+    console.print(f"[cyan]Size:[/cyan] {file_size:,} bytes")
+    console.print(f"[cyan]Release:[/cyan] {release_data['tag_name']}")
+    
+    # Download the file
+    zip_path = download_dir / filename
+    console.print(f"[cyan]Downloading template...[/cyan]")
+    
+    try:
+        with requests.get(download_url, stream=True, timeout=30) as response:
+            response.raise_for_status()
+            total_size = int(response.headers.get('content-length', 0))
+            
+            with open(zip_path, 'wb') as f:
+                if total_size == 0:
+                    # No content-length header, download without progress
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                else:
+                    # Show progress bar
+                    with Progress(
+                        SpinnerColumn(),
+                        TextColumn("[progress.description]{task.description}"),
+                        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
+                        console=console,
+                    ) as progress:
+                        task = progress.add_task("Downloading...", total=total_size)
+                        downloaded = 0
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                            downloaded += len(chunk)
+                            progress.update(task, completed=downloaded)
+    
+    except requests.RequestException as e:
+        console.print(f"[red]Error downloading template:[/red] {e}")
+        if zip_path.exists():
+            zip_path.unlink()
+        raise typer.Exit(1)
+    
+    console.print(f"[green]✓[/green] Downloaded: {filename}")
+    return zip_path
+
+
+def download_and_extract_template(project_path: Path, ai_assistant: str, is_current_dir: bool = False) -> Path:
     """Download the latest release and extract it to create a new project."""
-    project_path = Path(project_name).resolve()
     current_dir = Path.cwd()
     
     with Progress(
@@ -303,76 +383,95 @@ def download_and_extract_template(project_name: str, ai_assistant: str) -> Path:
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
-        # Download latest release template using gh CLI to current directory
-        task = progress.add_task("Downloading latest template...", total=None)
+        # Download latest release template using GitHub API
+        task = progress.add_task("Setting up template download...", total=None)
+        
         try:
-            pattern = f"sdd-template-{ai_assistant}-*.zip"
-            console.print(f"[cyan]Downloading pattern:[/cyan] {pattern}")
-            
-            run_command([
-                "gh", "release", "download", 
-                "--repo", "localden/sdd",
-                "--pattern", pattern
-            ])
-        except subprocess.CalledProcessError as e:
+            zip_path = download_template_from_github(ai_assistant, current_dir)
+        except Exception as e:
             console.print(f"[red]Error downloading template:[/red] {e}")
             raise typer.Exit(1)
+        
         progress.update(task, completed=True)
-        
-        # Find the downloaded template ZIP file in current directory
-        template_files = list(current_dir.glob(pattern))
-        if not template_files:
-            console.print("[red]Error:[/red] No template ZIP file found after download")
-            console.print(f"[yellow]Looking for files matching pattern: {pattern}[/yellow]")
-            console.print(f"[yellow]Files in current directory:[/yellow]")
-            for file in current_dir.iterdir():
-                if file.is_file() and file.suffix == '.zip':
-                    console.print(f"  - {file.name}")
-            raise typer.Exit(1)
-        
-        zip_path = template_files[0]
-        console.print(f"[cyan]Downloaded:[/cyan] {zip_path.name}")
-        console.print(f"[cyan]Size:[/cyan] {zip_path.stat().st_size:,} bytes")
         
         # Extract ZIP file
         task = progress.add_task("Extracting template...", total=None)
         try:
-            # Create project directory
-            project_path.mkdir(parents=True)
+            # Create project directory only if not using current directory
+            if not is_current_dir:
+                project_path.mkdir(parents=True)
             
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 # List all files in the ZIP for debugging
                 zip_contents = zip_ref.namelist()
                 console.print(f"[cyan]ZIP contains {len(zip_contents)} items[/cyan]")
                 
-                # Extract directly to project directory
-                zip_ref.extractall(project_path)
-                
-                # Check what was extracted
-                extracted_items = list(project_path.iterdir())
-                console.print(f"[cyan]Extracted {len(extracted_items)} items to {project_path}:[/cyan]")
-                for item in extracted_items:
-                    console.print(f"  - {item.name} ({'dir' if item.is_dir() else 'file'})")
-                
-                # Handle GitHub-style ZIP with a single root directory
-                if len(extracted_items) == 1 and extracted_items[0].is_dir():
-                    # Move contents up one level
-                    nested_dir = extracted_items[0]
-                    temp_move_dir = project_path.parent / f"{project_path.name}_temp"
+                # For current directory, extract to a temp location first
+                if is_current_dir:
+                    with tempfile.TemporaryDirectory() as temp_dir:
+                        temp_path = Path(temp_dir)
+                        zip_ref.extractall(temp_path)
+                        
+                        # Check what was extracted
+                        extracted_items = list(temp_path.iterdir())
+                        console.print(f"[cyan]Extracted {len(extracted_items)} items to temp location[/cyan]")
+                        
+                        # Handle GitHub-style ZIP with a single root directory
+                        source_dir = temp_path
+                        if len(extracted_items) == 1 and extracted_items[0].is_dir():
+                            source_dir = extracted_items[0]
+                            console.print(f"[cyan]Found nested directory structure[/cyan]")
+                        
+                        # Copy contents to current directory
+                        for item in source_dir.iterdir():
+                            dest_path = project_path / item.name
+                            if item.is_dir():
+                                if dest_path.exists():
+                                    console.print(f"[yellow]Merging directory:[/yellow] {item.name}")
+                                    # Recursively copy directory contents
+                                    for sub_item in item.rglob('*'):
+                                        if sub_item.is_file():
+                                            rel_path = sub_item.relative_to(item)
+                                            dest_file = dest_path / rel_path
+                                            dest_file.parent.mkdir(parents=True, exist_ok=True)
+                                            shutil.copy2(sub_item, dest_file)
+                                else:
+                                    shutil.copytree(item, dest_path)
+                            else:
+                                if dest_path.exists():
+                                    console.print(f"[yellow]Overwriting file:[/yellow] {item.name}")
+                                shutil.copy2(item, dest_path)
+                        
+                        console.print(f"[cyan]Template files merged into current directory[/cyan]")
+                else:
+                    # Extract directly to project directory (original behavior)
+                    zip_ref.extractall(project_path)
                     
-                    # Move the nested directory contents to temp location
-                    shutil.move(str(nested_dir), str(temp_move_dir))
-                    # Remove the now-empty project directory
-                    project_path.rmdir()
-                    # Rename temp directory to project directory
-                    shutil.move(str(temp_move_dir), str(project_path))
+                    # Check what was extracted
+                    extracted_items = list(project_path.iterdir())
+                    console.print(f"[cyan]Extracted {len(extracted_items)} items to {project_path}:[/cyan]")
+                    for item in extracted_items:
+                        console.print(f"  - {item.name} ({'dir' if item.is_dir() else 'file'})")
                     
-                    console.print(f"[cyan]Flattened nested directory structure[/cyan]")
+                    # Handle GitHub-style ZIP with a single root directory
+                    if len(extracted_items) == 1 and extracted_items[0].is_dir():
+                        # Move contents up one level
+                        nested_dir = extracted_items[0]
+                        temp_move_dir = project_path.parent / f"{project_path.name}_temp"
+                        
+                        # Move the nested directory contents to temp location
+                        shutil.move(str(nested_dir), str(temp_move_dir))
+                        # Remove the now-empty project directory
+                        project_path.rmdir()
+                        # Rename temp directory to project directory
+                        shutil.move(str(temp_move_dir), str(project_path))
+                        
+                        console.print(f"[cyan]Flattened nested directory structure[/cyan]")
                     
         except Exception as e:
             console.print(f"[red]Error extracting template:[/red] {e}")
-            # Clean up project directory if created
-            if project_path.exists():
+            # Clean up project directory if created and not current directory
+            if not is_current_dir and project_path.exists():
                 shutil.rmtree(project_path)
             raise typer.Exit(1)
         finally:
@@ -388,19 +487,20 @@ def download_and_extract_template(project_name: str, ai_assistant: str) -> Path:
 
 @app.command()
 def init(
-    project_name: str = typer.Argument(help="Name for your new project directory"),
+    project_name: str = typer.Argument(None, help="Name for your new project directory (optional if using --here)"),
     ai_assistant: str = typer.Option(None, "--ai", help="AI assistant to use: claude, gemini, or copilot"),
     ignore_agent_tools: bool = typer.Option(False, "--ignore-agent-tools", help="Skip checks for AI agent tools like Claude Code"),
     no_git: bool = typer.Option(False, "--no-git", help="Skip git repository initialization"),
+    here: bool = typer.Option(False, "--here", help="Initialize project in the current directory instead of creating a new one"),
 ):
     """
     Initialize a new Specify project from the latest template.
     
     This command will:
-    1. Check that required tools are installed (git (optional), gh)
+    1. Check that required tools are installed (git is optional)
     2. Let you choose your AI assistant (Claude Code, Gemini CLI, or GitHub Copilot)
     3. Download the appropriate template from GitHub
-    4. Extract the template to a new project directory
+    4. Extract the template to a new project directory or current directory
     5. Initialize a fresh git repository (if not --no-git and no existing repo)
     6. Optionally set up AI assistant commands
     
@@ -410,20 +510,50 @@ def init(
         specify init my-project --ai gemini
         specify init my-project --ai copilot --no-git
         specify init --ignore-agent-tools my-project
+        specify init --here --ai claude
+        specify init --here
     """
     # Show banner first
     show_banner()
     
+    # Validate arguments
+    if here and project_name:
+        console.print("[red]Error:[/red] Cannot specify both project name and --here flag")
+        raise typer.Exit(1)
+    
+    if not here and not project_name:
+        console.print("[red]Error:[/red] Must specify either a project name or use --here flag")
+        raise typer.Exit(1)
+    
+    # Determine project directory
+    if here:
+        project_name = Path.cwd().name
+        project_path = Path.cwd()
+        
+        # Check if current directory has any files
+        existing_items = list(project_path.iterdir())
+        if existing_items:
+            console.print(f"[yellow]Warning:[/yellow] Current directory is not empty ({len(existing_items)} items)")
+            console.print("[yellow]Template files will be merged with existing content and may overwrite existing files[/yellow]")
+            
+            # Ask for confirmation
+            response = typer.confirm("Do you want to continue?")
+            if not response:
+                console.print("[yellow]Operation cancelled[/yellow]")
+                raise typer.Exit(0)
+    else:
+        project_path = Path(project_name).resolve()
+        # Check if project directory already exists
+        if project_path.exists():
+            console.print(f"[red]Error:[/red] Directory '{project_name}' already exists")
+            raise typer.Exit(1)
+    
     console.print(Panel.fit(
         "[bold cyan]Specify Project Setup[/bold cyan]\n"
-        f"Creating new project: [green]{project_name}[/green]",
+        f"{'Initializing in current directory:' if here else 'Creating new project:'} [green]{project_path.name}[/green]"
+        + (f"\n[dim]Path: {project_path}[/dim]" if here else ""),
         border_style="cyan"
     ))
-    
-    # Check if project directory already exists
-    if os.path.exists(project_name):
-        console.print(f"[red]Error:[/red] Directory '{project_name}' already exists")
-        raise typer.Exit(1)
     
     # Check required tools
     console.print("\n[bold]Checking required tools...[/bold]")
@@ -432,14 +562,10 @@ def init(
     git_available = True
     if not no_git:
         git_available = check_tool("git", "https://git-scm.com/downloads")
+        if not git_available:
+            console.print("[yellow]Git not found - will skip repository initialization[/yellow]")
     
-    # Check gh CLI (always required for template download)
-    gh_available = check_tool("gh", "https://cli.github.com/")
-    
-    if not gh_available:
-        console.print("\n[red]GitHub CLI (gh) is required for downloading templates![/red]")
-        console.print("[red]Cannot proceed without gh.[/red]")
-        raise typer.Exit(1)
+    console.print("[green]✓[/green] All required tools are available")
     
     # AI assistant selection
     if ai_assistant:
@@ -479,17 +605,15 @@ def init(
     console.print("\n[bold]Setting up project from latest template...[/bold]")
     
     try:
-        download_and_extract_template(project_name, selected_ai)
+        download_and_extract_template(project_path, selected_ai, here)
         
         # Handle git repository initialization
         if not no_git:
-            project_absolute_path = Path(project_name).resolve()
-            
-            if is_git_repo(project_absolute_path):
-                console.print(f"[yellow]ℹ️[/yellow] Existing git repository detected in {project_name}")
+            if is_git_repo(project_path):
+                console.print(f"[yellow]ℹ️[/yellow] Existing git repository detected")
                 console.print("[green]✓[/green] Skipping git initialization")
             elif git_available:
-                if init_git_repo(project_absolute_path):
+                if init_git_repo(project_path):
                     pass  # Success message already printed in init_git_repo
                 else:
                     console.print("[yellow]⚠️  Git repository initialization failed, but project was created successfully[/yellow]")
@@ -501,9 +625,9 @@ def init(
         
     except Exception as e:
         console.print(f"[red]Failed to set up project:[/red] {e}")
-        # Clean up partial directory if it was created
-        if os.path.exists(project_name):
-            shutil.rmtree(project_name)
+        # Clean up partial directory if it was created and not current directory
+        if not here and project_path.exists():
+            shutil.rmtree(project_path)
         raise typer.Exit(1)
     
     # Success!
@@ -513,26 +637,32 @@ def init(
     console.print("─" * 60)
     
     console.print("\n[bold]Next steps:[/bold]")
-    console.print(f"1. [cyan]cd {project_name}[/cyan]")
+    if not here:
+        console.print(f"1. [cyan]cd {project_name}[/cyan]")
+        step_num = "2"
+    else:
+        console.print("1. You're already in the project directory!")
+        step_num = "2"
     
     if selected_ai == "claude":
-        console.print("2. Open in VSCode and start using / commands with Claude Code")
+        console.print(f"{step_num}. Open in VSCode and start using / commands with Claude Code")
         console.print("   - Type / in any file to see available commands")
         console.print("   - Use [cyan]/spec[/cyan] to create specifications")
         console.print("   - Use [cyan]/plan[/cyan] to create implementation plans")
         console.print("   - Use [cyan]/tasks[/cyan] to generate tasks")
     elif selected_ai == "gemini":
-        console.print("2. Use @ commands with Gemini CLI")
+        console.print(f"{step_num}. Use @ commands with Gemini CLI")
         console.print("   - Run [cyan]gemini @spec[/cyan] to create specifications")
         console.print("   - Run [cyan]gemini @plan[/cyan] to create implementation plans")
         console.print("   - See [cyan]GEMINI.md[/cyan] for all available commands")
     elif selected_ai == "copilot":
-        console.print("2. Open in VSCode and use natural language with GitHub Copilot")
+        console.print(f"{step_num}. Open in VSCode and use natural language with GitHub Copilot")
         console.print("   - See .github/copilot-instructions.md for available commands")
         console.print("   - Use Copilot Chat for interactive assistance")
     
-    console.print("3. Read README.md for project overview")
-    console.print("4. Check the documentation in the docs/ folder")
+    next_step = str(int(step_num) + 1)
+    console.print(f"{next_step}. Read README.md for project overview")
+    console.print(f"{str(int(next_step) + 1)}. Check the documentation in the docs/ folder")
     
     console.print("\n[italic bright_yellow]Happy coding with Specify! 🚀[/italic bright_yellow]\n")
 
@@ -543,9 +673,14 @@ def check():
     show_banner()
     console.print("[bold]Checking Specify requirements...[/bold]\n")
     
-    # Check critical tools
-    all_ok = all(check_tool(tool, hint) for tool, hint in CRITICAL_TOOLS)
-    all_ok &= check_tool("uv", "curl -LsSf https://astral.sh/uv/install.sh | sh")
+    # Check if we have internet connectivity by trying to reach GitHub API
+    console.print("[cyan]Checking internet connectivity...[/cyan]")
+    try:
+        response = requests.get("https://api.github.com", timeout=5)
+        console.print("[green]✓[/green] Internet connection available")
+    except requests.RequestException:
+        console.print("[red]✗[/red] No internet connection - required for downloading templates")
+        console.print("[yellow]Please check your internet connection[/yellow]")
     
     console.print("\n[cyan]Optional tools:[/cyan]")
     git_ok = check_tool("git", "https://git-scm.com/downloads")
@@ -554,15 +689,11 @@ def check():
     claude_ok = check_tool("claude", "Install from: https://docs.anthropic.com/en/docs/claude-code/setup")
     gemini_ok = check_tool("gemini", "Install from: https://github.com/google-gemini/gemini-cli")
     
-    if all_ok:
-        console.print("\n[green]✓ All required tools installed![/green]")
-        if not git_ok:
-            console.print("[yellow]Consider installing git for repository management[/yellow]")
-        if not (claude_ok or gemini_ok):
-            console.print("[yellow]Consider installing an AI assistant for the best experience[/yellow]")
-    else:
-        console.print("\n[red]✗ Some required tools are missing[/red]")
-        raise typer.Exit(1)
+    console.print("\n[green]✓ Specify CLI is ready to use![/green]")
+    if not git_ok:
+        console.print("[yellow]Consider installing git for repository management[/yellow]")
+    if not (claude_ok or gemini_ok):
+        console.print("[yellow]Consider installing an AI assistant for the best experience[/yellow]")
 
 
 def main():
