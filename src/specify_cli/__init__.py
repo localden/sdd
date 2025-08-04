@@ -304,7 +304,7 @@ def download_template_from_github(ai_assistant: str, download_dir: Path) -> Path
     api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/releases/latest"
     
     try:
-        response = httpx.get(api_url, timeout=30)
+        response = httpx.get(api_url, timeout=30, follow_redirects=True)
         response.raise_for_status()
         release_data = response.json()
     except httpx.RequestError as e:
@@ -340,7 +340,7 @@ def download_template_from_github(ai_assistant: str, download_dir: Path) -> Path
     console.print(f"[cyan]Downloading template...[/cyan]")
     
     try:
-        with httpx.stream("GET", download_url, timeout=30) as response:
+        with httpx.stream("GET", download_url, timeout=30, follow_redirects=True) as response:
             response.raise_for_status()
             total_size = int(response.headers.get('content-length', 0))
             
@@ -676,7 +676,7 @@ def check():
     # Check if we have internet connectivity by trying to reach GitHub API
     console.print("[cyan]Checking internet connectivity...[/cyan]")
     try:
-        response = httpx.get("https://api.github.com", timeout=5)
+        response = httpx.get("https://api.github.com", timeout=5, follow_redirects=True)
         console.print("[green]✓[/green] Internet connection available")
     except httpx.RequestError:
         console.print("[red]✗[/red] No internet connection - required for downloading templates")
