@@ -48,9 +48,9 @@ import readchar
 
 # Constants
 AI_CHOICES = {
+    "copilot": "GitHub Copilot",
     "claude": "Claude Code",
-    "gemini": "Gemini CLI", 
-    "copilot": "GitHub Copilot"
+    "gemini": "Gemini CLI"
 }
 
 # ASCII Art Banner
@@ -578,7 +578,7 @@ def init(
         selected_ai = select_with_arrows(
             AI_CHOICES, 
             "Choose your AI assistant:", 
-            "claude"
+            "copilot"
         )
     
     console.print(f"[green]✓ Selected AI assistant:[/green] {AI_CHOICES[selected_ai]}")

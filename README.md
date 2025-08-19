@@ -34,6 +34,46 @@
 
 Specification-Driven Development (SDD) **flips the script** on traditional software development. For decades, code has been king — specifications were just scaffolding we built and discarded once the "real work" of coding began. SDD changes this: **specifications become executable**, directly generating working implementations rather than just guiding them.
 
+## ⚡ Get started
+
+### 1. Install Specify
+
+Initialize your project depending on the coding agent you're using:
+
+```bash
+uvx --from git+https://github.com/localden/sdd.git specify init <PROJECT_NAME>
+```
+
+### 2. Create the spec
+
+Use the `/specify` command to describe what you want to build. The output will be a baseline feature spec, branch, and scaffolding.
+
+```bash
+/specify Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums never other nested albums. Within each album, photos are previewed in a tile-like interface.
+```
+
+>[!NOTE]
+>The more detailed the prompt, the better. Don't focus on the tech stack - focus on answering the **what** and **why**.
+
+### 3. Create a technical implementation plan
+
+Use the `/plan` command to provide your choices of tech and architecture. The output will be an implementation plan and supporting artifacts.
+
+```bash
+/plan The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
+```
+
+>[!NOTE]
+>Just like with the feature spec, be as explicit as possible. Otherwise, it's likely the agent will make the choices for you.
+
+### 4. Break down the plan into tasks
+
+Use `/tasks` to create an ordered, actionable task list. These tasks will be used by the agent to build out the project.
+
+### 5. Ask the agent to implement the feature
+
+With the task list ready, you can now ask the agent to go and build out your project.
+
 ## 📚 Core philosophy
 
 SDD is a structured process that emphasizes:
@@ -183,7 +223,7 @@ The first step should be creating a new project scaffolding. Use `/specify` comm
 >[!IMPORTANT]
 >Be as explicit as possible about _what_ you are trying to build and _why_. **Do not focus on the tech stack at this point**.
 
-An example prompt, as described by John Lam, can be:
+An example prompt:
 
 ```text
 Develop Taskify, a team productivity platform. It should allow users to create projects, add team members,
