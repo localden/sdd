@@ -7,23 +7,9 @@ Break down the plan into executable tasks.
 
 This is the third step in the Spec-Driven Development lifecycle.
 
-Given the context provided as an argument, I need you to:
+Given the context provided as an argument, do this:
 
-1. Check prerequisites and find available documents:
-   ```bash
-   REPO_ROOT=$(git rev-parse --show-toplevel)
-   RESULT=$($REPO_ROOT/scripts/check-task-prerequisites.sh)
-   
-   if [[ $? -ne 0 ]]; then
-     echo "$RESULT"
-     exit 1
-   fi
-   
-   FEATURE_DIR=$(echo "$RESULT" | grep "FEATURE_DIR:" | cut -d':' -f2)
-   echo "Generating tasks for: $FEATURE_DIR"
-   echo "$RESULT" | grep -A20 "AVAILABLE_DOCS:"
-   ```
-
+1. Run `scripts/check-task-prerequisites.sh --json` from repo root and parse FEATURE_DIR and AVAILABLE_DOCS list. All paths must be absolute.
 2. Load and analyze available design documents:
    - Always read plan.md for tech stack and libraries
    - IF EXISTS: Read data-model.md for entities
@@ -65,7 +51,7 @@ Given the context provided as an argument, I need you to:
    - Group [P] tasks that can run together
    - Show actual Task agent commands
 
-7. Create $FEATURE_DIR/tasks.md with:
+7. Create FEATURE_DIR/tasks.md with:
    - Correct feature name from implementation plan
    - Numbered tasks (T001, T002, etc.)
    - Clear file paths for each task
@@ -74,4 +60,4 @@ Given the context provided as an argument, I need you to:
 
 Context for task generation: {ARGS}
 
-The tasks.md should be immediately executable - each task should be specific enough that an LLM can complete it without additional context.
+The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.

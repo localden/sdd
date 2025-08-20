@@ -1,13 +1,30 @@
 #!/bin/bash
 # Create a new feature with branch, directory structure, and template
 # Usage: ./create-new-feature.sh "feature description"
+#        ./create-new-feature.sh --json "feature description"
 
 set -e
 
-FEATURE_DESCRIPTION="$1"
+JSON_MODE=false
+
+# Collect non-flag args
+ARGS=()
+for arg in "$@"; do
+    case "$arg" in
+        --json)
+            JSON_MODE=true
+            ;;
+        --help|-h)
+            echo "Usage: $0 [--json] <feature_description>"; exit 0 ;;
+        *)
+            ARGS+=("$arg") ;;
+    esac
+done
+
+FEATURE_DESCRIPTION="${ARGS[*]}"
 if [ -z "$FEATURE_DESCRIPTION" ]; then
-    echo "Usage: $0 <feature_description>"
-    exit 1
+        echo "Usage: $0 [--json] <feature_description>" >&2
+        exit 1
 fi
 
 # Get repository root
@@ -68,7 +85,12 @@ else
     touch "$SPEC_FILE"
 fi
 
-# Output results for the LLM to use
-echo "BRANCH_NAME: $BRANCH_NAME"
-echo "SPEC_FILE: $SPEC_FILE"
-echo "FEATURE_NUM: $FEATURE_NUM"
+if $JSON_MODE; then
+    printf '{"BRANCH_NAME":"%s","SPEC_FILE":"%s","FEATURE_NUM":"%s"}\n' \
+        "$BRANCH_NAME" "$SPEC_FILE" "$FEATURE_NUM"
+else
+    # Output results for the LLM to use (legacy key: value format)
+    echo "BRANCH_NAME: $BRANCH_NAME"
+    echo "SPEC_FILE: $SPEC_FILE"
+    echo "FEATURE_NUM: $FEATURE_NUM"
+fi
