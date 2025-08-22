@@ -17,31 +17,14 @@
 
 - [🤔 What is SDD?](#-what-is-sdd)
 - [⚡ Get started](#-get-started)
-    - [1. Install Specify](#1-install-specify)
-    - [2. Create the spec](#2-create-the-spec)
-    - [3. Create a technical implementation plan](#3-create-a-technical-implementation-plan)
-    - [4. Break down the plan into tasks](#4-break-down-the-plan-into-tasks)
-    - [5. Ask the agent to implement the feature](#5-ask-the-agent-to-implement-the-feature)
 - [📚 Core philosophy](#-core-philosophy)
 - [🌟 Development phases](#-development-phases)
 - [🎯 Experimental goals](#-experimental-goals)
-    - [Technology independence](#technology-independence)
-    - [Enterprise constraints](#enterprise-constraints)
-    - [User-centric development](#user-centric-development)
-    - [Creative & iterative processes](#creative--iterative-processes)
 - [🔧 Prerequisites](#-prerequisites)
-- [🚀 Quickstart](#-quickstart)
-    - [Understanding the methodology](#understanding-the-methodology)
-    - [Before using the CLI](#before-using-the-cli)
-    - [Using the CLI](#using-the-cli)
-    - [STEP 0: Initialize your project](#step-0-initialize-your-project)
-    - [STEP 1: Bootstrap the project](#step-1-bootstrap-the-project)
-    - [STEP 2: Functional specification clarification](#step-2-functional-specification-clarification)
-    - [STEP 3: Generate a plan](#step-3-generate-a-plan)
-    - [STEP 4: Have Claude Code validate the plan](#step-4-have-claude-code-validate-the-plan)
-    - [STEP 5: Implementation](#step-5-implementation)
-- [Appendix](#appendix)
-    - [Appendix A: Installing GCM on Debian-based Linux OS](#appendix-a-installing-gcm-on-debian-based-linux-os)
+- [🚀 Quick start](#-quick-start)
+- [📖 Learn more](#-learn-more)
+- [Detailed process](#detailed-process)
+- [Troubleshooting](#troubleshooting)
 
 ## 🤔 What is SDD?
 
@@ -59,33 +42,25 @@ uvx --from git+https://github.com/localden/sdd.git specify init <PROJECT_NAME>
 
 ### 2. Create the spec
 
-Use the `/specify` command to describe what you want to build. The output will be a baseline feature spec, branch, and scaffolding.
+Use the `/specify` command to describe what you want to build. Focus on the **what** and **why**, not the tech stack.
 
 ```bash
 /specify Build an application that can help me organize my photos in separate photo albums. Albums are grouped by date and can be re-organized by dragging and dropping on the main page. Albums never other nested albums. Within each album, photos are previewed in a tile-like interface.
 ```
 
->[!NOTE]
->The more detailed the prompt, the better. Don't focus on the tech stack - focus on answering the **what** and **why**.
-
 ### 3. Create a technical implementation plan
 
-Use the `/plan` command to provide your choices of tech and architecture. The output will be an implementation plan and supporting artifacts.
+Use the `/plan` command to provide your tech stack and architecture choices.
 
 ```bash
 /plan The application uses Vite with minimal number of libraries. Use vanilla HTML, CSS, and JavaScript as much as possible. Images are not uploaded anywhere and metadata is stored in a local SQLite database.
 ```
 
->[!NOTE]
->Just like with the feature spec, be as explicit as possible. Otherwise, it's likely the agent will make the choices for you.
+### 4. Break down and implement
 
-### 4. Break down the plan into tasks
+Use `/tasks` to create an actionable task list, then ask your agent to implement the feature.
 
-Use `/tasks` to create an ordered, actionable task list. These tasks will be used by the agent to build out the project.
-
-### 5. Ask the agent to implement the feature
-
-With the task list ready, you can now ask the agent to go and build out your project.
+For detailed step-by-step instructions, see our [comprehensive guide](./sdd.md).
 
 ## 📚 Core philosophy
 
@@ -132,66 +107,24 @@ Our research and experimentation focus on:
 
 ## 🔧 Prerequisites
 
-To use this repository effectively:
-
-- **Linux** ([WSL2](https://learn.microsoft.com/windows/wsl/install) if you're using Windows) or **macOS**
-      - This is required for the embedded helper scripts. In the future, we will support Windows natively as well.
-- Agentic AI developer tools:
-      - [Visual Studio Code with GitHub Copilot](https://code.visualstudio.com/)
-      - [Claude Code](https://www.anthropic.com/claude-code)
-      - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
-- [uv](https://docs.astral.sh/uv/) - we use this instead of `pip` for package management
-- [Python 3.11](https://www.python.org/downloads/) at least
+- **Linux/macOS** (or WSL2 on Windows)
+- AI coding agent: [Claude Code](https://www.anthropic.com/claude-code), [GitHub Copilot](https://code.visualstudio.com/), or [Gemini CLI](https://github.com/google-gemini/gemini-cli)
+- [uv](https://docs.astral.sh/uv/) for package management
+- [Python 3.11+](https://www.python.org/downloads/)
 - [Git](https://git-scm.com/downloads)
-- Internet connection for downloading templates
 
-## 🚀 Quickstart
+## 📖 Learn more
 
-### Understanding the methodology
+- **[Complete SDD Methodology](./sdd.md)** - Deep dive into the full process
+- **[Specify Proposal](./specify-proposal.md)** - Vision for SDD tooling
+- **[Detailed Walkthrough](#detailed-process)** - Step-by-step implementation guide
 
-Start by reading the core documents to familiarize yourself with the principles:
+---
 
-1. [**`sdd.md`**](./sdd.md) - The complete SDD methodology.
-2. [**`specify-proposal.md`**](./specify-proposal.md) - Vision for tooling to support SDD.
+## Detailed process
 
-### Before using the CLI
-
-You will need to make sure that you have `git` installed on your machine and that you are logged in with your GitHub account. The easiest way to do that is with the help of [Git Credential Manager](https://github.com/git-ecosystem/git-credential-manager) (GCM).
-
-You can [refer to the appendix](#appendix-a-installing-gcm-on-debian-based-linux-os) to learn about how to one-script install GCM on Debian-based Linux distributions.
-
-If you are using Linux, after installing GCM you will need to make sure that you set it as your credential helper:
-
-```bash
-git-credential-manager configure
-git config --global --unset-all credential.helper
-git config --global credential.helper manager
-```
-
-You will also need to make sure that the Git settings are correctly configured for your users for the CLI to properly set up the Git project:
-
-```bash
-git config --global user.name "Test User"
-git config --global user.email "you@example.com"
-```
-
-### Using the CLI
-
-To help bootstrap the process, we have build a Command Line Interface (CLI) tool, called `specify`, that will help you create the required artifacts for your project. To bootstrap a project, you will need to use the `specify init` command.
-
-#### Option 1: Using uvx (no installation)
-
-```bash
-uvx --from git+https://github.com/localden/sdd.git specify init <PROJECT_NAME>
-```
-
-#### Option 2: Install globally
-
-```bash
-uv tool install git+https://github.com/localden/sdd.git
-```
-
-### **STEP 0:** Initialize your project
+<details>
+<summary>Click to expand the detailed step-by-step walkthrough</summary>
 
 You can use the Specify CLI to bootstrap your project, which will bring in the required artifacts in your environment. Run:
 
@@ -409,27 +342,25 @@ Claude Code will spring into action and will start creating the implementation.
 
 Once the implementation step is done, ask Claude Code to try to run the application and resolve any emerging build errors. If the application runs, but there are _runtime errors_ that are not directly available to Claude Code through CLI logs (e.g., errors rendered in browser logs), copy and paste the error in Claude Code and have it attempt to resolve it.
 
-## Appendix
+</details>
 
-### Appendix A: Installing GCM on Debian-based Linux OS
+---
+
+## Troubleshooting
+
+### Git Credential Manager on Linux
+
+If you're having issues with Git authentication on Linux, you can install Git Credential Manager:
 
 ```bash
 #!/bin/bash
-
 set -e
-
 echo "Downloading Git Credential Manager v2.6.1..."
 wget https://github.com/git-ecosystem/git-credential-manager/releases/download/v2.6.1/gcm-linux_amd64.2.6.1.deb
-
 echo "Installing Git Credential Manager..."
 sudo dpkg -i gcm-linux_amd64.2.6.1.deb
-
 echo "Configuring Git to use GCM..."
 git config --global credential.helper manager
-
 echo "Cleaning up..."
 rm gcm-linux_amd64.2.6.1.deb
-
-echo "Git Credential Manager installed successfully!"
-echo "You can now use 'git credential-manager' commands."
 ```
