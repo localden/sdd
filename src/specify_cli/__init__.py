@@ -406,7 +406,7 @@ def download_template_from_github(ai_assistant: str, download_dir: Path, *, verb
         raise typer.Exit(1)
     
     # Find the template asset for the specified AI assistant
-    pattern = f"sdd-template-{ai_assistant}"
+    pattern = f"spec-kit-template-{ai_assistant}"
     matching_assets = [
         asset for asset in release_data.get("assets", [])
         if pattern in asset["name"] and asset["name"].endswith(".zip")
