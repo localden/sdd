@@ -1,15 +1,12 @@
 <div align="center">
     <img src="./media/logo_small.webp"/>
-    <h1>🌱 Specification-Driven Development (SDD)</h1>
-    <h3><em>Build high-quality software - faster.</em></h3>
+    <h1>🌱 Spec Kit</h1>
+    <h3><em>Build high-quality software faster.</em></h3>
 </div>
 
 <p align="center">
-    <strong>An effort to allow organizations to focus on product scenarios rather than writing undifferentiated code.</strong>
+    <strong>An effort to allow organizations to focus on product scenarios rather than writing undifferentiated code with the help of Spec-Driven Development.</strong>
 </p>
-
->[!NOTE]
->This repository is heavily influenced by and based on the work of [John Lam](https://github.com/jflam).
 
 ---
 
@@ -362,3 +359,7 @@ git config --global credential.helper manager
 echo "Cleaning up..."
 rm gcm-linux_amd64.2.6.1.deb
 ```
+
+## Acknowledgements
+
+This project is heavily influenced by and based on the work and research of [John Lam](https://github.com/jflam).
