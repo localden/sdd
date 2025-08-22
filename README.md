@@ -114,8 +114,7 @@ Our research and experimentation focus on:
 
 ## 📖 Learn more
 
-- **[Complete SDD Methodology](./sdd.md)** - Deep dive into the full process
-- **[Specify Proposal](./specify-proposal.md)** - Vision for SDD tooling
+- **[Complete SDD Methodology](./spec-driven.md)** - Deep dive into the full process
 - **[Detailed Walkthrough](#detailed-process)** - Step-by-step implementation guide
 
 ---
