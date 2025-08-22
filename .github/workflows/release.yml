@@ -70,8 +70,10 @@ jobs:
         fi
 
         if [ -d "templates" ]; then
-          cp -r templates sdd-package-base/
-          echo "Copied templates folder"
+          mkdir -p sdd-package-base/templates
+          # Copy templates folder but exclude the commands directory
+          find templates -type f -not -path "templates/commands/*" -exec cp --parents {} sdd-package-base/ \;
+          echo "Copied templates folder (excluding commands directory)"
         fi
         
         # Generate command files for each agent from source templates
