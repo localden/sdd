@@ -12,7 +12,7 @@
 
 ## Table of Contents
 
-- [🤔 What is SDD?](#-what-is-sdd)
+- [🤔 What is Spec-Driven Development?](#-what-is-spec-driven-development)
 - [⚡ Get started](#-get-started)
 - [📚 Core philosophy](#-core-philosophy)
 - [🌟 Development phases](#-development-phases)
@@ -22,9 +22,9 @@
 - [Detailed process](#detailed-process)
 - [Troubleshooting](#troubleshooting)
 
-## 🤔 What is SDD?
+## 🤔 What is Spec-Driven Development?
 
-Specification-Driven Development (SDD) **flips the script** on traditional software development. For decades, code has been king — specifications were just scaffolding we built and discarded once the "real work" of coding began. SDD changes this: **specifications become executable**, directly generating working implementations rather than just guiding them.
+Spec-Driven Development **flips the script** on traditional software development. For decades, code has been king — specifications were just scaffolding we built and discarded once the "real work" of coding began. Spec-Driven Development changes this: **specifications become executable**, directly generating working implementations rather than just guiding them.
 
 ## ⚡ Get started
 
@@ -56,11 +56,11 @@ Use the `/plan` command to provide your tech stack and architecture choices.
 
 Use `/tasks` to create an actionable task list, then ask your agent to implement the feature.
 
-For detailed step-by-step instructions, see our [comprehensive guide](./sdd.md).
+For detailed step-by-step instructions, see our [comprehensive guide](./spec-driven.md).
 
 ## 📚 Core philosophy
 
-SDD is a structured process that emphasizes:
+Spec-Driven Development is a structured process that emphasizes:
 
 - **Intent-driven development** where specifications define the "_what_" before the "_how_"
 - **Rich specification creation** using guardrails and organizational principles
@@ -82,7 +82,7 @@ Our research and experimentation focus on:
 ### Technology independence
 
 - Create applications using diverse technology stacks
-- Validate the hypothesis that SDD is a process not tied to specific technologies, programming languages, or frameworks
+- Validate the hypothesis that Spec-Driven Development is a process not tied to specific technologies, programming languages, or frameworks
 
 ### Enterprise constraints
 
@@ -111,7 +111,7 @@ Our research and experimentation focus on:
 
 ## 📖 Learn more
 
-- **[Complete SDD Methodology](./spec-driven.md)** - Deep dive into the full process
+- **[Complete Spec-Driven Development Methodology](./spec-driven.md)** - Deep dive into the full process
 - **[Detailed Walkthrough](#detailed-process)** - Step-by-step implementation guide
 
 ---
