@@ -21,7 +21,6 @@
 - [🌟 Development phases](#-development-phases)
 - [🎯 Experimental goals](#-experimental-goals)
 - [🔧 Prerequisites](#-prerequisites)
-- [🚀 Quick start](#-quick-start)
 - [📖 Learn more](#-learn-more)
 - [Detailed process](#detailed-process)
 - [Troubleshooting](#troubleshooting)
